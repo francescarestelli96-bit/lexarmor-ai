@@ -97,7 +97,7 @@ const complianceBadges = [
   },
 ];
 
-export function ContractStudio({ compact = false }: { compact?: boolean }) {
+export function ContractStudio() {
   const [text, setText] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState("");
@@ -197,31 +197,26 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
   ] as const;
 
   return (
-    <section
-      className={`grid h-full min-h-0 gap-5 ${
-        compact ? "xl:grid-cols-[0.9fr_1.1fr]" : "xl:grid-cols-[0.95fr_1.05fr]"
-      }`}
-    >
-      <div className="min-h-0 rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(9,15,28,0.92))] p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+      <section className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-6 lg:p-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-xl">
             <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Contract text
+              Contract input
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
-              Carica il testo del contratto.
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white lg:text-3xl">
+              Analizza un contratto in pochi secondi.
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
-              Incolla il contenuto da analizzare. Il risultato verra’
-              organizzato in tre livelli di severita’ con un risk score
-              sintetico.
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              Incolla il testo completo. Riceverai un risk score, una
+              classificazione per severita’ e note di negoziazione leggibili.
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setText(sampleContract)}
-            className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-emerald-400/50 hover:text-white"
+            className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-emerald-400/50 hover:text-white"
           >
             Carica demo
           </button>
@@ -231,12 +226,10 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="Incolla qui il contratto..."
-          className={`mt-6 w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 ${
-            compact ? "h-[280px] 2xl:h-[340px]" : "h-[360px]"
-          }`}
+          className="mt-6 h-[320px] w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 lg:h-[420px]"
         />
 
-        <div className="mt-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-wrap gap-2">
             {complianceBadges.map((badge) => {
               const Icon = badge.icon;
@@ -278,21 +271,21 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
             {error}
           </div>
         ) : null}
-      </div>
+      </section>
 
-      <div className="flex min-h-0 flex-col rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] p-6">
-        <div className="flex items-start justify-between gap-4">
+      <section className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] p-6 lg:p-7">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
               Risk dashboard
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
-              {analysis ? "Analisi completata" : "Nessuna analisi disponibile"}
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white lg:text-3xl">
+              {analysis ? "Analisi completata" : "In attesa di un contratto"}
             </h2>
           </div>
           {verdict ? (
             <span
-              className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${verdict.badgeClass}`}
+              className={`inline-flex self-start rounded-full px-3 py-1 text-xs font-medium ${verdict.badgeClass}`}
             >
               {verdict.label}
             </span>
@@ -323,7 +316,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
         ) : analysis ? (
-          <div className="mt-6 min-h-0 flex-1 overflow-auto pr-1">
+          <div className="mt-6 space-y-4">
             <div className="rounded-[1.6rem] border border-white/8 bg-white/5 p-5">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -343,13 +336,13 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
               </p>
             </div>
 
-            <div className="mt-4 grid gap-4 xl:grid-cols-3">
+            <div className="space-y-4">
               {panels.map((panel) => (
                 <section
                   key={panel.key}
                   className={`rounded-[1.5rem] border p-5 ${panel.tone}`}
                 >
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="text-lg font-semibold text-white">
                         {panel.title}
@@ -359,7 +352,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                       </p>
                     </div>
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${panel.badge}`}
+                      className={`inline-flex self-start rounded-full px-3 py-1 text-xs font-medium ${panel.badge}`}
                     >
                       {panel.items.length}
                     </span>
@@ -367,14 +360,12 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
 
                   <div className="mt-4 space-y-3">
                     {panel.items.length ? (
-                      panel.items
-                        .slice(0, compact ? 1 : panel.items.length)
-                        .map((clause, index) => (
-                          <RiskClauseCard
-                            key={`${panel.key}-${clause.title}-${index}`}
-                            clause={clause}
-                          />
-                        ))
+                      panel.items.map((clause, index) => (
+                        <RiskClauseCard
+                          key={`${panel.key}-${clause.title}-${index}`}
+                          clause={clause}
+                        />
+                      ))
                     ) : (
                       <EmptyState text={panel.empty} />
                     )}
@@ -383,20 +374,18 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
               ))}
             </div>
 
-            <div className="mt-4 grid gap-4 xl:grid-cols-2">
+            <div className="grid gap-4 xl:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/8 bg-white/5 p-5">
                 <h3 className="text-sm uppercase tracking-[0.22em] text-slate-400">
                   Obblighi nascosti
                 </h3>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
-                  {analysis.hiddenObligations
-                    .slice(0, compact ? 3 : analysis.hiddenObligations.length)
-                    .map((item, index) => (
-                      <li key={`${item}-${index}`} className="flex gap-3">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
+                  {analysis.hiddenObligations.map((item, index) => (
+                    <li key={`${item}-${index}`} className="flex gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -405,32 +394,30 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                   Mosse di negoziazione
                 </h3>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
-                  {analysis.negotiationMoves
-                    .slice(0, compact ? 3 : analysis.negotiationMoves.length)
-                    .map((item, index) => (
-                      <li key={`${item}-${index}`} className="flex gap-3">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-300" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
+                  {analysis.negotiationMoves.map((item, index) => (
+                    <li key={`${item}-${index}`} className="flex gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-300" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
 
-            <p className="mt-4 text-xs leading-6 text-slate-400">
+            <p className="text-xs leading-6 text-slate-400">
               {analysis.disclaimer}
             </p>
           </div>
         ) : (
           <div className="mt-6 rounded-[1.6rem] border border-dashed border-white/12 bg-white/[0.03] p-6">
             <p className="text-sm uppercase tracking-[0.24em] text-slate-400">
-              Output previsto
+              Cosa vedrai qui
             </p>
             <div className="mt-5 grid gap-3">
               {[
-                "Critical Risks con clausole potenzialmente vessatorie",
-                "Attention Required per punti da rinegoziare",
-                "Standard / Safe per sezioni non anomale",
+                "Risk Score sintetico",
+                "Critical Risks, Attention Required e Standard / Safe",
+                "Note di negoziazione e obblighi nascosti",
               ].map((item, index) => (
                 <div
                   key={item}
@@ -439,10 +426,10 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                   <span
                     className={`h-2 w-2 rounded-full ${
                       index === 0
-                        ? "bg-red-400"
+                        ? "bg-emerald-400"
                         : index === 1
                           ? "bg-amber-300"
-                          : "bg-emerald-400"
+                          : "bg-red-400"
                     }`}
                   />
                   <span>{item}</span>
@@ -451,8 +438,8 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
         )}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 

@@ -23,7 +23,7 @@ const tabs: Array<{ id: TabId; label: string }> = [
   { id: "segments", label: "Segments" },
 ];
 
-const plans = [
+const planCards = [
   {
     name: "Basic",
     price: "19€",
@@ -75,7 +75,7 @@ const securityCards = [
   },
 ];
 
-const segments = [
+const segmentCards = [
   {
     title: "Privati",
     body: "Per chi deve firmare un affitto o un contratto di servizi e vuole una lettura del rischio prima della firma.",
@@ -93,118 +93,74 @@ const segments = [
   },
 ];
 
-const tabContent = {
-  analysis: {
-    eyebrow: "Contract analysis",
-    title: "Una workspace piu' chiara, meno densa e piu' leggibile.",
-    description:
-      "Input e dashboard stanno nella stessa vista, ma con una gerarchia piu' pulita e spazi piu' equilibrati.",
-  },
-  plans: {
-    eyebrow: "Commercial plans",
-    title: "Piani accessibili senza trasformare il prodotto in una landing.",
-    description:
-      "Le informazioni commerciali restano presenti, ma separate dall'analisi e con un tono piu' sobrio.",
-  },
-  security: {
-    eyebrow: "Security posture",
-    title: "La fiducia deve stare vicino al flusso operativo.",
-    description:
-      "Le informazioni su protezione, privacy e data handling restano vicine al prodotto e facili da leggere.",
-  },
-  segments: {
-    eyebrow: "Use cases",
-    title: "Messaggi distinti per i profili che possono acquistare.",
-    description:
-      "Ogni segmento vede subito il contesto d'uso piu' rilevante senza dover attraversare una landing lunga.",
-  },
-} as const;
-
 export function LexArmorControlCenter() {
   const [activeTab, setActiveTab] = useState<TabId>("analysis");
-  const current = tabContent[activeTab];
 
   return (
-    <main className="h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_22%),#020817] text-white">
-      <div className="mx-auto h-full max-w-[1520px] p-4 lg:p-5">
-        <div className="flex h-full min-h-0 flex-col rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] shadow-[0_30px_120px_rgba(0,0,0,0.35)]">
-          <header className="border-b border-white/10 px-5 py-5 lg:px-7">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-950">
-                  LA
-                </span>
-                <div>
-                  <p className="text-base font-semibold tracking-[0.12em] text-white">
-                    LexArmor
-                  </p>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Contract risk analysis
-                  </p>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.06),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.05),transparent_22%),#020817] text-white">
+      <div className="mx-auto max-w-[1440px] px-4 py-5 lg:px-6 lg:py-6">
+        <header className="rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] px-5 py-5 shadow-[0_20px_80px_rgba(0,0,0,0.28)] lg:px-7">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-4">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-950">
+                LA
+              </span>
+              <div>
+                <div className="text-lg font-semibold tracking-[0.08em] text-white">
+                  LexArmor
+                </div>
+                <div className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                  Contract risk analysis
                 </div>
               </div>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
-                  Encrypted transmission
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
-                  No data retention
-                </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
+                Encrypted transmission
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
+                No data retention
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveTab("analysis")}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+              >
+                Open analysis
+                <ArrowUpRight size={15} />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {tabs.map((tab) => {
+              const selected = tab.id === activeTab;
+
+              return (
                 <button
+                  key={tab.id}
                   type="button"
-                  onClick={() => setActiveTab("analysis")}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                    selected
+                      ? "bg-white text-slate-950"
+                      : "border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06]"
+                  }`}
                 >
-                  Open analysis
-                  <ArrowUpRight size={15} />
+                  {tab.label}
                 </button>
-              </div>
-            </div>
+              );
+            })}
+          </div>
+        </header>
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {tabs.map((tab) => {
-                const selected = tab.id === activeTab;
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                      selected
-                        ? "bg-white text-slate-950"
-                        : "border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06]"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          </header>
-
-          <section className="flex min-h-0 flex-1 flex-col px-5 py-5 lg:px-7 lg:py-6">
-            <div className="shrink-0">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                {current.eyebrow}
-              </p>
-              <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-[-0.05em] text-white lg:text-4xl">
-                {current.title}
-              </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300 lg:text-base">
-                {current.description}
-              </p>
-            </div>
-
-            <div className="mt-6 min-h-0 flex-1">
-              {activeTab === "analysis" ? <ContractStudio compact /> : null}
-              {activeTab === "plans" ? <PlansBoard /> : null}
-              {activeTab === "security" ? <SecurityBoard /> : null}
-              {activeTab === "segments" ? <SegmentsBoard /> : null}
-            </div>
-          </section>
-        </div>
+        <section className="mt-5 rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.94),rgba(2,8,23,0.96))] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.22)] lg:p-7">
+          {activeTab === "analysis" ? <ContractStudio /> : null}
+          {activeTab === "plans" ? <PlansBoard /> : null}
+          {activeTab === "security" ? <SecurityBoard /> : null}
+          {activeTab === "segments" ? <SegmentsBoard /> : null}
+        </section>
       </div>
     </main>
   );
@@ -212,107 +168,129 @@ export function LexArmorControlCenter() {
 
 function PlansBoard() {
   return (
-    <div className="grid h-full gap-5 overflow-auto pr-1 xl:grid-cols-2">
-      {plans.map((plan) => {
-        const Icon = plan.icon;
+    <div className="space-y-4">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+          Commercial plans
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+          Due piani, descritti in modo semplice.
+        </h2>
+      </div>
 
-        return (
-          <article
-            key={plan.name}
-            className={`flex min-h-[420px] flex-col rounded-[2rem] border p-7 ${plan.tone}`}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-                  {plan.name}
-                </p>
-                <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] text-white">
-                    {plan.price}
-                  </span>
-                  <span className="pb-2 text-sm text-slate-400">
-                    {plan.frequency}
-                  </span>
+      <div className="grid gap-5 xl:grid-cols-2">
+        {planCards.map((plan) => {
+          const Icon = plan.icon;
+
+          return (
+            <article
+              key={plan.name}
+              className={`flex min-h-[420px] flex-col rounded-[1.8rem] border p-7 ${plan.tone}`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {plan.name}
+                  </p>
+                  <div className="mt-4 flex items-end gap-2">
+                    <span className="text-5xl font-semibold tracking-[-0.05em] text-white">
+                      {plan.price}
+                    </span>
+                    <span className="pb-2 text-sm text-slate-400">
+                      {plan.frequency}
+                    </span>
+                  </div>
+                </div>
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white">
+                  <Icon size={22} />
                 </div>
               </div>
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white">
-                <Icon size={22} />
-              </div>
-            </div>
 
-            <p className="mt-5 text-sm leading-7 text-slate-300">
-              {plan.description}
-            </p>
+              <p className="mt-5 text-sm leading-7 text-slate-300">
+                {plan.description}
+              </p>
 
-            <ul className="mt-6 grid gap-3">
-              {plan.points.map((point) => (
-                <li key={point} className="flex gap-3 text-sm text-slate-100">
-                  <CheckCircle2 size={17} className="mt-0.5 text-emerald-300" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
+              <ul className="mt-6 grid gap-3">
+                {plan.points.map((point) => (
+                  <li key={point} className="flex gap-3 text-sm text-slate-100">
+                    <CheckCircle2 size={17} className="mt-0.5 text-emerald-300" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
 
-            <button
-              type="button"
-              className={`mt-auto inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold transition ${plan.buttonClass}`}
-            >
-              Select plan
-              <ArrowUpRight size={15} />
-            </button>
-          </article>
-        );
-      })}
+              <button
+                type="button"
+                className={`mt-auto inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold transition ${plan.buttonClass}`}
+              >
+                Select plan
+                <ArrowUpRight size={15} />
+              </button>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 function SecurityBoard() {
   return (
-    <div className="grid h-full gap-5 overflow-auto pr-1 xl:grid-cols-[1.05fr_0.95fr]">
-      <div className="grid gap-5">
-        {securityCards.map((card) => {
-          const Icon = card.icon;
-
-          return (
-            <article
-              key={card.title}
-              className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6"
-            >
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
-                <Icon size={20} />
-              </div>
-              <h3 className="mt-4 text-2xl font-semibold text-white">
-                {card.title}
-              </h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                {card.body}
-              </p>
-            </article>
-          );
-        })}
+    <div className="space-y-4">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+          Security posture
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+          Protezione leggibile, senza rumore inutile.
+        </h2>
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6">
-        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Operational trust
-        </p>
-        <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          Protezione leggibile vicino al flusso di lavoro.
-        </h3>
-        <div className="mt-6 grid gap-3">
-          {[
-            "Privacy comunicata vicino al punto di upload",
-            "Badge di protezione integrati nell'interfaccia",
-            "Lessico sobrio e coerente con un posizionamento premium",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
-            >
-              {item}
-            </div>
-          ))}
+      <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-5">
+          {securityCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <article
+                key={card.title}
+                className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6"
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
+                  <Icon size={20} />
+                </div>
+                <h3 className="mt-4 text-2xl font-semibold text-white">
+                  {card.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-300">
+                  {card.body}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="rounded-[1.8rem] border border-white/10 bg-slate-900/70 p-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+            Operational trust
+          </p>
+          <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+            Informazioni chiare vicino al flusso di lavoro.
+          </h3>
+          <div className="mt-6 grid gap-3">
+            {[
+              "Privacy comunicata vicino al punto di upload",
+              "Badge di protezione integrati nell'interfaccia",
+              "Lessico sobrio e coerente con un posizionamento premium",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -321,50 +299,61 @@ function SecurityBoard() {
 
 function SegmentsBoard() {
   return (
-    <div className="grid h-full gap-5 overflow-auto pr-1 xl:grid-cols-[1.05fr_0.95fr]">
-      <div className="grid gap-5">
-        {segments.map((segment) => {
-          const Icon = segment.icon;
-
-          return (
-            <article
-              key={segment.title}
-              className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6"
-            >
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/8 text-slate-100">
-                <Icon size={20} />
-              </div>
-              <h3 className="mt-4 text-2xl font-semibold text-white">
-                {segment.title}
-              </h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                {segment.body}
-              </p>
-            </article>
-          );
-        })}
+    <div className="space-y-4">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+          Use cases
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+          Tre segmenti, tre contesti chiari.
+        </h2>
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6">
-        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Segment focus
-        </p>
-        <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          Ogni profilo vede subito il proprio caso d’uso.
-        </h3>
-        <div className="mt-6 grid gap-3">
-          {[
-            "Privati: riduzione del rischio prima della firma",
-            "Agenzie: accelerazione del primo screening",
-            "Consulenti: revisione preliminare piu' presentabile",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
-            >
-              {item}
-            </div>
-          ))}
+      <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-5">
+          {segmentCards.map((segment) => {
+            const Icon = segment.icon;
+
+            return (
+              <article
+                key={segment.title}
+                className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6"
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/8 text-slate-100">
+                  <Icon size={20} />
+                </div>
+                <h3 className="mt-4 text-2xl font-semibold text-white">
+                  {segment.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-300">
+                  {segment.body}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="rounded-[1.8rem] border border-white/10 bg-slate-900/70 p-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+            Segment focus
+          </p>
+          <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+            Ogni profilo vede subito il proprio caso d’uso.
+          </h3>
+          <div className="mt-6 grid gap-3">
+            {[
+              "Privati: riduzione del rischio prima della firma",
+              "Agenzie: accelerazione del primo screening",
+              "Consulenti: revisione preliminare piu' presentabile",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
