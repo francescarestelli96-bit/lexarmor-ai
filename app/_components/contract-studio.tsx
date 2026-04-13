@@ -207,7 +207,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
             : "lg:grid-cols-[1.08fr_0.92fr]"
         }`}
       >
-        <div className={`space-y-5 ${compact ? "min-h-0" : ""}`}>
+        <div className={`space-y-5 ${compact ? "min-h-0 overflow-auto pr-1" : ""}`}>
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-200">
               <ScanSearch size={14} className="text-emerald-300" />
@@ -224,15 +224,15 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                 compact ? "text-2xl xl:text-3xl" : "text-3xl md:text-4xl"
               }`}
             >
-              Incolla il contratto e ricevi una dashboard di rischio credibile.
+              Carica il testo e ottieni una lettura strutturata del rischio.
             </h2>
             <p
               className={`max-w-2xl text-slate-300 ${
                 compact ? "text-sm leading-6" : "text-base leading-7"
               }`}
             >
-              LexArmor organizza l’analisi in segnali rossi, gialli e verdi,
-              con un Risk Score immediato e note da usare in trattativa.
+              LexArmor organizza l’analisi per severità, evidenzia le clausole
+              da verificare e restituisce un punteggio sintetico del rischio.
             </p>
           </div>
 
@@ -247,13 +247,13 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
               <div className="text-xs uppercase tracking-[0.22em] text-slate-400">
                 Review
               </div>
-              <div className="mt-2 text-lg text-white">Macro-aree</div>
+              <div className="mt-2 text-lg text-white">Severità</div>
             </div>
             <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
               <div className="text-xs uppercase tracking-[0.22em] text-slate-400">
                 Security
               </div>
-              <div className="mt-2 text-lg text-white">Privacy-first</div>
+              <div className="mt-2 text-lg text-white">Protected flow</div>
             </div>
           </div>
 
@@ -300,8 +300,8 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                 )}
               </button>
               <p className="text-sm text-slate-400">
-                Minimo consigliato: 80 caratteri. Output progettato per essere
-                chiaro anche per chi non è legale.
+                Minimo consigliato: 80 caratteri. L’output è leggibile anche
+                per utenti non tecnici o non legali.
               </p>
             </div>
 
@@ -340,7 +340,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
                 Risk intelligence
               </p>
               <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">
-                {analysis ? "Risk Score Dashboard" : "In attesa del contratto"}
+                {analysis ? "Risk Score Dashboard" : "Nessuna analisi disponibile"}
               </h3>
             </div>
             {verdict ? (
@@ -357,7 +357,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
               <div className="flex items-center gap-3 text-emerald-300">
                 <LoaderCircle size={18} className="animate-spin" />
                 <span className="text-sm uppercase tracking-[0.22em]">
-                  Scanning in progress
+                  Analisi in corso
                 </span>
               </div>
               <div className="mt-6 space-y-3">
@@ -485,7 +485,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
           ) : (
             <div className="mt-8 rounded-[1.6rem] border border-dashed border-white/12 bg-white/[0.03] p-6">
               <p className="text-sm uppercase tracking-[0.26em] text-slate-400">
-                Cosa vedrai qui
+                Output previsto
               </p>
               <ul className="mt-4 space-y-4 text-sm leading-7 text-slate-200">
                 <li className="flex gap-3">

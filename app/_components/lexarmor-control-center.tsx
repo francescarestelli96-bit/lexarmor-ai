@@ -27,46 +27,46 @@ const tabs: Array<{
 }> = [
   {
     id: "studio",
-    label: "Studio",
-    eyebrow: "Core product",
+    label: "Analysis",
+    eyebrow: "Workspace",
     icon: LayoutGrid,
-    title: "Una scansione premium senza dispersione.",
+    title: "Analisi contrattuale in un’unica vista.",
     description:
-      "Tutto il valore di LexArmor resta in una singola schermata operativa: input, risk score e lettura dei rischi.",
+      "Upload, risk score e lettura delle clausole restano nello stesso ambiente operativo.",
   },
   {
     id: "pricing",
-    label: "Pricing",
-    eyebrow: "Monetization",
+    label: "Plans",
+    eyebrow: "Commercial",
     icon: CircleDollarSign,
-    title: "Prezzi visibili senza allungare la landing.",
+    title: "Piani chiari, senza elementi promozionali superflui.",
     description:
-      "Il piano singolo e il piano agenzie vivono dentro lo stesso control center, così l’offerta è sempre chiara ma non dispersiva.",
+      "Il pricing resta accessibile nel prodotto, senza trasformare l’interfaccia in una landing dispersiva.",
   },
   {
     id: "security",
-    label: "Shield",
-    eyebrow: "Trust layer",
+    label: "Security",
+    eyebrow: "Protection",
     icon: ShieldCheck,
-    title: "Sicurezza e protezione al centro della UX.",
+    title: "Segnali di sicurezza integrati nel prodotto.",
     description:
-      "I segnali di fiducia devono stare vicini al prodotto, non persi in fondo a una landing lunga.",
+      "Crittografia, privacy e data handling devono stare vicino al flusso di analisi.",
   },
   {
     id: "clients",
-    label: "Clients",
-    eyebrow: "Market fit",
+    label: "Segments",
+    eyebrow: "Use cases",
     icon: Users2,
-    title: "Messaggi adattati ai buyer più probabili.",
+    title: "Messaggi distinti per i profili che possono acquistare.",
     description:
-      "Privati, agenzie e consulenti vedono subito come il prodotto si applica al loro scenario concreto.",
+      "Privati, agenzie e consulenti vedono subito il caso d’uso rilevante.",
   },
 ];
 
 const quickSignals = [
   "Risk Score immediato",
-  "Critical, Attention, Safe",
-  "Nessun layout dispersivo",
+  "Classificazione per severità",
+  "Nessuna landing lunga",
 ];
 
 const pricingTiers = [
@@ -75,7 +75,7 @@ const pricingTiers = [
     price: "19€",
     frequency: "per analisi",
     description:
-      "Per clienti privati che vogliono un controllo rapido ma autorevole prima della firma.",
+      "Analisi singola per revisioni puntuali prima della firma.",
     points: [
       "1 scansione premium",
       "Risk Score e tre macro-aree",
@@ -91,7 +91,7 @@ const pricingTiers = [
     price: "49€",
     frequency: "al mese",
     description:
-      "Pensato per agenzie e consulenti che analizzano contratti in modo continuativo.",
+      "Accesso continuativo per team che gestiscono un volume costante di contratti.",
     points: [
       "Analisi illimitate",
       "Workflow più adatto ai team",
@@ -108,17 +108,17 @@ const pricingTiers = [
 const trustCards = [
   {
     title: "256-bit Encryption",
-    body: "Trasmissione protetta tra browser e server per mantenere il flusso affidabile e professionale.",
+    body: "Trasmissione protetta tra browser e server durante l’intero flusso di analisi.",
     icon: LockKeyhole,
   },
   {
     title: "GDPR Ready",
-    body: "Struttura progettata per un posizionamento privacy-first, utile anche in ottica enterprise.",
+    body: "Architettura compatibile con una comunicazione privacy-first verso clienti e partner.",
     icon: Fingerprint,
   },
   {
     title: "No Data Retention",
-    body: "LexArmor non salva il testo inviato, così il messaggio di protezione resta semplice e forte.",
+    body: "Il testo caricato non viene conservato dalla piattaforma dopo l’elaborazione.",
     icon: ShieldCheck,
   },
 ];
@@ -126,17 +126,17 @@ const trustCards = [
 const clientCards = [
   {
     title: "Privati",
-    body: "Per chi deve firmare un affitto o un servizio e vuole ridurre il rischio senza leggere tutto da solo.",
+    body: "Chi sta per firmare un affitto o un contratto di servizi e vuole una lettura del rischio prima della firma.",
     icon: ShieldCheck,
   },
   {
     title: "Agenzie",
-    body: "Per team immobiliari che vogliono un primo layer di controllo elegante prima di coinvolgere legale o cliente.",
+    body: "Team immobiliari che vogliono un primo livello di screening prima del passaggio a cliente o legale.",
     icon: Building2,
   },
   {
     title: "Consulenti",
-    body: "Per professionisti che vogliono offrire una prima revisione vendibile, leggibile e ad alto margine.",
+    body: "Professionisti che vogliono offrire una prima revisione sintetica, leggibile e presentabile.",
     icon: Users2,
   },
 ];
@@ -146,9 +146,9 @@ export function LexArmorControlCenter() {
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   return (
-    <main className="bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.10),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_22%),#020817] text-white lg:h-screen lg:overflow-hidden">
-      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col px-3 py-3 lg:h-screen lg:min-h-0">
-        <div className="flex flex-1 flex-col rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] shadow-[0_30px_120px_rgba(0,0,0,0.35)] lg:min-h-0">
+    <main className="h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.10),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_22%),#020817] text-white">
+      <div className="mx-auto flex h-full max-w-[1600px] flex-col px-3 py-3">
+        <div className="flex min-h-0 flex-1 flex-col rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] shadow-[0_30px_120px_rgba(0,0,0,0.35)]">
           <header className="border-b border-white/10 px-4 py-4 sm:px-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
@@ -160,17 +160,17 @@ export function LexArmorControlCenter() {
                     LexArmor
                   </p>
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                    Contract defense control center
+                    Contract risk analysis
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
-                  No-scroll desktop UX
+                  Encrypted transmission
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
-                  Premium scan from 19€
+                  No data retention
                 </span>
                 <button
                   type="button"
@@ -184,23 +184,23 @@ export function LexArmorControlCenter() {
             </div>
           </header>
 
-          <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[340px_minmax(0,1fr)]">
-            <aside className="border-b border-white/10 px-4 py-5 sm:px-6 lg:min-h-0 lg:border-b-0 lg:border-r lg:px-5">
-              <div className="flex h-full flex-col">
+          <div className="grid min-h-0 flex-1 lg:grid-cols-[300px_minmax(0,1fr)]">
+            <aside className="min-h-0 border-b border-white/10 px-4 py-4 sm:px-6 lg:border-b-0 lg:border-r lg:px-5">
+              <div className="flex h-full min-h-0 flex-col">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                     {active.eyebrow}
                   </p>
-                  <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-white">
-                    Il tuo scudo legale istantaneo contro le trappole contrattuali.
+                  <h1 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+                    Analisi contrattuale in una singola interfaccia operativa.
                   </h1>
-                  <p className="mt-4 text-sm leading-7 text-slate-300">
-                    Tutto sta dentro un’unica interfaccia: menu chiaro, pannelli
-                    dedicati e nessuna landing lunga che disperde attenzione.
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    Menu essenziale, pannelli dedicati e contenuti concentrati
+                    sul processo di revisione.
                   </p>
                 </div>
 
-                <nav className="mt-6 grid gap-2">
+                <nav className="mt-5 grid gap-2">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const selected = tab.id === activeTab;
@@ -236,19 +236,19 @@ export function LexArmorControlCenter() {
                   })}
                 </nav>
 
-                <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 lg:flex-1">
-                  <h2 className="text-xl font-semibold text-white">
+                <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
+                  <h2 className="text-lg font-semibold text-white">
                     {active.title}
                   </h2>
-                  <p className="mt-3 text-sm leading-7 text-slate-300">
+                  <p className="mt-3 text-sm leading-6 text-slate-300">
                     {active.description}
                   </p>
 
-                  <div className="mt-5 grid gap-3">
+                  <div className="mt-4 grid gap-2">
                     {quickSignals.map((item) => (
                       <div
                         key={item}
-                        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-slate-100"
+                        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2.5 text-sm text-slate-100"
                       >
                         <CheckCircle2 size={16} className="text-emerald-300" />
                         <span>{item}</span>
@@ -259,8 +259,8 @@ export function LexArmorControlCenter() {
               </div>
             </aside>
 
-            <section className="min-h-0 px-4 py-5 sm:px-6 lg:px-5 lg:py-5">
-              <div className="h-full lg:min-h-0">
+            <section className="min-h-0 overflow-hidden px-4 py-4 sm:px-6 lg:px-5">
+              <div className="h-full min-h-0">
                 {activeTab === "studio" ? <ContractStudio compact /> : null}
                 {activeTab === "pricing" ? <PricingBoard /> : null}
                 {activeTab === "security" ? <SecurityBoard /> : null}
@@ -276,7 +276,7 @@ export function LexArmorControlCenter() {
 
 function PricingBoard() {
   return (
-    <div className="grid h-full gap-4 lg:grid-cols-2">
+    <div className="grid h-full gap-4 overflow-auto pr-1 lg:grid-cols-2">
       {pricingTiers.map((tier) => {
         const Icon = tier.icon;
 
@@ -304,7 +304,7 @@ function PricingBoard() {
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-7 text-slate-300">
+            <p className="mt-5 text-sm leading-6 text-slate-300">
               {tier.description}
             </p>
 
@@ -321,7 +321,7 @@ function PricingBoard() {
               type="button"
               className={`mt-auto inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold transition ${tier.ctaClass}`}
             >
-              Attiva offerta
+              Seleziona piano
               <ArrowUpRight size={15} />
             </button>
           </article>
@@ -333,7 +333,7 @@ function PricingBoard() {
 
 function SecurityBoard() {
   return (
-    <div className="grid h-full gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="grid h-full gap-4 overflow-auto pr-1 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="grid gap-4">
         {trustCards.map((card) => {
           const Icon = card.icon;
@@ -359,21 +359,21 @@ function SecurityBoard() {
 
       <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(16,185,129,0.10),rgba(15,23,42,0.98))] p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-emerald-200">
-          Trust by design
+          Security posture
         </p>
         <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          La fiducia deve stare accanto al prodotto.
+          Protezione visibile, senza rumore promozionale.
         </h3>
-        <p className="mt-4 text-sm leading-7 text-slate-300">
-          Invece di finire in basso in una landing lunga, i segnali di sicurezza
-          sono integrati nella shell del prodotto e nello studio di analisi.
+        <p className="mt-4 text-sm leading-6 text-slate-300">
+          Le informazioni di sicurezza restano vicine al punto di upload e alla
+          dashboard, dove hanno valore operativo.
         </p>
 
         <div className="mt-6 grid gap-3">
           {[
-            "Messaggio privacy leggibile in 3 secondi",
-            "Badge di protezione vicino all’upload",
-            "Tono visuale da software affidabile, non da tool amatoriale",
+            "Privacy comunicata vicino al flusso di analisi",
+            "Badge di protezione integrati nell’interfaccia",
+            "Lessico sobrio e compatibile con un posizionamento premium",
           ].map((item) => (
             <div
               key={item}
@@ -390,7 +390,7 @@ function SecurityBoard() {
 
 function ClientsBoard() {
   return (
-    <div className="grid h-full gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="grid h-full gap-4 overflow-auto pr-1 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="grid gap-4">
         {clientCards.map((card) => {
           const Icon = card.icon;
@@ -416,16 +416,16 @@ function ClientsBoard() {
 
       <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Go-to-market fit
+          Market focus
         </p>
         <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          Stesso prodotto, tre letture commerciali chiare.
+          Un prodotto, tre contesti di acquisto distinti.
         </h3>
         <div className="mt-6 grid gap-3">
           {[
-            "Privati: paura di firmare qualcosa di sbagliato",
-            "Agenzie: velocizzare il primo screening",
-            "Consulenti: impacchettare una revisione premium",
+            "Privati: ridurre il rischio prima della firma",
+            "Agenzie: accelerare il primo screening",
+            "Consulenti: strutturare una revisione preliminare",
           ].map((item) => (
             <div
               key={item}
