@@ -8,7 +8,6 @@ import {
   Fingerprint,
   LoaderCircle,
   LockKeyhole,
-  ScanSearch,
   Shield,
   ShieldCheck,
 } from "lucide-react";
@@ -61,25 +60,25 @@ const verdictCopy = {
 
 const severityCopy = {
   critical: {
-    label: "Critical Risk",
+    label: "Critical",
     icon: AlertTriangle,
     className: "text-red-300",
   },
   medium: {
-    label: "Attention Required",
+    label: "Attention",
     icon: Shield,
     className: "text-amber-200",
   },
   safe: {
-    label: "Standard / Safe",
+    label: "Safe",
     icon: CheckCircle2,
     className: "text-emerald-200",
   },
 } as const;
 
 const scanningSteps = [
-  "Scanning structure and clause density",
-  "Checking penalties, obligations and unilateral terms",
+  "Reading structure and clause density",
+  "Checking penalties and unilateral obligations",
   "Scoring legal exposure and negotiation points",
 ];
 
@@ -113,7 +112,7 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
 
     const interval = window.setInterval(() => {
       setScanIndex((current) => (current + 1) % scanningSteps.length);
-    }, 850);
+    }, 900);
 
     return () => window.clearInterval(interval);
   }, [isPending]);
@@ -167,355 +166,297 @@ export function ContractStudio({ compact = false }: { compact?: boolean }) {
     [analysis]
   );
 
-  const categoryCards = [
+  const panels = [
     {
       key: "critical",
       title: "Critical Risks",
-      subtitle: "Clausole vessatorie e penali nascoste.",
+      subtitle: "Clausole vessatorie e penali nascoste",
       tone: "border-red-400/15 bg-red-400/8",
       badge: "bg-red-400/15 text-red-200",
       items: groupedClauses.critical,
+      empty: "Nessuna criticita' forte rilevata.",
     },
     {
       key: "medium",
       title: "Attention Required",
-      subtitle: "Punti da rinegoziare o ambiguità.",
+      subtitle: "Punti da rinegoziare o chiarire",
       tone: "border-amber-300/15 bg-amber-300/8",
       badge: "bg-amber-300/15 text-amber-100",
       items: groupedClauses.medium,
+      empty: "Nessuna area gialla rilevante.",
     },
     {
       key: "safe",
       title: "Standard / Safe",
-      subtitle: "Clausole conformi o non anomale.",
+      subtitle: "Clausole non anomale",
       tone: "border-emerald-400/15 bg-emerald-400/8",
       badge: "bg-emerald-400/15 text-emerald-100",
       items: groupedClauses.safe,
+      empty: "Nessuna clausola standard evidenziata.",
     },
   ] as const;
 
   return (
     <section
-      className={`rounded-[2rem] border border-slate-800 bg-[linear-gradient(180deg,#0f172a_0%,#111c34_100%)] shadow-[0_30px_120px_rgba(0,0,0,0.35)] ${
-        compact ? "flex h-full min-h-0 flex-col p-5 lg:p-6" : "p-5 md:p-8"
+      className={`grid h-full min-h-0 gap-5 ${
+        compact ? "xl:grid-cols-[0.9fr_1.1fr]" : "xl:grid-cols-[0.95fr_1.05fr]"
       }`}
     >
-      <div
-        className={`grid gap-6 ${
-          compact
-            ? "min-h-0 flex-1 xl:grid-cols-[0.95fr_1.05fr]"
-            : "lg:grid-cols-[1.08fr_0.92fr]"
-        }`}
-      >
-        <div className={`space-y-5 ${compact ? "min-h-0 overflow-auto pr-1" : ""}`}>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-200">
-              <ScanSearch size={14} className="text-emerald-300" />
-              Enterprise contract scan
-            </span>
-            <span className="text-xs uppercase tracking-[0.24em] text-slate-400">
-              affitti, servizi, consulenze, collaborazioni
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            <h2
-              className={`max-w-xl font-semibold tracking-[-0.04em] text-white ${
-                compact ? "text-2xl xl:text-3xl" : "text-3xl md:text-4xl"
-              }`}
-            >
-              Carica il testo e ottieni una lettura strutturata del rischio.
+      <div className="min-h-0 rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(9,15,28,0.92))] p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+              Contract text
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
+              Carica il testo del contratto.
             </h2>
-            <p
-              className={`max-w-2xl text-slate-300 ${
-                compact ? "text-sm leading-6" : "text-base leading-7"
-              }`}
-            >
-              LexArmor organizza l’analisi per severità, evidenzia le clausole
-              da verificare e restituisce un punteggio sintetico del rischio.
+            <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
+              Incolla il contenuto da analizzare. Il risultato verra’
+              organizzato in tre livelli di severita’ con un risk score
+              sintetico.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-              <div className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Output
-              </div>
-              <div className="mt-2 text-lg text-white">Risk Score</div>
-            </div>
-            <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-              <div className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Review
-              </div>
-              <div className="mt-2 text-lg text-white">Severità</div>
-            </div>
-            <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-              <div className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Security
-              </div>
-              <div className="mt-2 text-lg text-white">Protected flow</div>
-            </div>
-          </div>
-
-          <div className="rounded-[1.8rem] border border-white/10 bg-[#0b1728] p-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <span className="text-sm uppercase tracking-[0.2em] text-slate-400">
-                Testo del contratto
-              </span>
-              <button
-                type="button"
-                onClick={() => setText(sampleContract)}
-                className="rounded-full border border-white/10 px-3 py-1 text-xs font-medium text-slate-200 transition hover:border-emerald-400/50 hover:text-white"
-              >
-                Carica demo
-              </button>
-            </div>
-
-            <textarea
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              placeholder="Incolla qui il contratto. Più testo dai, più l'analisi sarà utile."
-              className={`w-full resize-none rounded-[1.4rem] border border-white/8 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/50 ${
-                compact ? "h-40 xl:h-48" : "h-72"
-              }`}
-            />
-
-            <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
-              <button
-                type="button"
-                disabled={isPending || text.trim().length < 80}
-                onClick={analyzeContract}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-[#04101c] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
-              >
-                {isPending ? (
-                  <>
-                    <LoaderCircle size={16} className="animate-spin" />
-                    Scanning...
-                  </>
-                ) : (
-                  <>
-                    Analizza contratto
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
-              <p className="text-sm text-slate-400">
-                Minimo consigliato: 80 caratteri. L’output è leggibile anche
-                per utenti non tecnici o non legali.
-              </p>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {complianceBadges.map((badge) => {
-                const Icon = badge.icon;
-
-                return (
-                  <div
-                    key={badge.label}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-200"
-                  >
-                    <Icon size={16} className="text-emerald-300" />
-                    <span>{badge.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {error ? (
-              <div className="mt-4 rounded-[1.2rem] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
-                {error}
-              </div>
-            ) : null}
-          </div>
+          <button
+            type="button"
+            onClick={() => setText(sampleContract)}
+            className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-emerald-400/50 hover:text-white"
+          >
+            Carica demo
+          </button>
         </div>
 
-        <div
-          className={`rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] ${
-            compact ? "flex min-h-0 flex-col p-5" : "p-5 md:p-6"
+        <textarea
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          placeholder="Incolla qui il contratto..."
+          className={`mt-6 w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 ${
+            compact ? "h-[280px] 2xl:h-[340px]" : "h-[360px]"
           }`}
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.26em] text-slate-400">
-                Risk intelligence
-              </p>
-              <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">
-                {analysis ? "Risk Score Dashboard" : "Nessuna analisi disponibile"}
-              </h3>
-            </div>
-            {verdict ? (
-              <span
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${verdict.badgeClass}`}
-              >
-                {verdict.label}
-              </span>
-            ) : null}
+        />
+
+        <div className="mt-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {complianceBadges.map((badge) => {
+              const Icon = badge.icon;
+
+              return (
+                <div
+                  key={badge.label}
+                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-slate-200"
+                >
+                  <Icon size={14} className="text-emerald-300" />
+                  <span>{badge.label}</span>
+                </div>
+              );
+            })}
           </div>
 
-          {isPending ? (
-            <div className="mt-8 rounded-[1.6rem] border border-slate-700 bg-slate-950/40 p-6">
-              <div className="flex items-center gap-3 text-emerald-300">
-                <LoaderCircle size={18} className="animate-spin" />
-                <span className="text-sm uppercase tracking-[0.22em]">
-                  Analisi in corso
-                </span>
-              </div>
-              <div className="mt-6 space-y-3">
-                {scanningSteps.map((step, index) => (
-                  <div
-                    key={step}
-                    className={`rounded-2xl border px-4 py-3 text-sm transition ${
-                      index === scanIndex
-                        ? "border-emerald-400/40 bg-emerald-400/10 text-white"
-                        : "border-white/8 bg-white/[0.03] text-slate-400"
-                    }`}
-                  >
-                    {step}
-                  </div>
-                ))}
-              </div>
+          <button
+            type="button"
+            disabled={isPending || text.trim().length < 80}
+            onClick={analyzeContract}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-[#04101c] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
+          >
+            {isPending ? (
+              <>
+                <LoaderCircle size={16} className="animate-spin" />
+                Analisi in corso
+              </>
+            ) : (
+              <>
+                Analizza contratto
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </div>
+
+        {error ? (
+          <div className="mt-4 rounded-[1.2rem] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+            {error}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="flex min-h-0 flex-col rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+              Risk dashboard
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
+              {analysis ? "Analisi completata" : "Nessuna analisi disponibile"}
+            </h2>
+          </div>
+          {verdict ? (
+            <span
+              className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${verdict.badgeClass}`}
+            >
+              {verdict.label}
+            </span>
+          ) : null}
+        </div>
+
+        {isPending ? (
+          <div className="mt-6 rounded-[1.6rem] border border-slate-700 bg-slate-950/40 p-6">
+            <div className="flex items-center gap-3 text-emerald-300">
+              <LoaderCircle size={18} className="animate-spin" />
+              <span className="text-sm uppercase tracking-[0.22em]">
+                Analisi in corso
+              </span>
             </div>
-          ) : analysis ? (
-            <div className={`mt-6 space-y-5 ${compact ? "min-h-0 overflow-auto pr-1" : ""}`}>
-              <div className="rounded-[1.6rem] border border-white/8 bg-white/5 p-5">
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                      Risk Score
-                    </p>
-                    <div className="mt-2 text-5xl font-semibold tracking-[-0.05em] text-white">
-                      {analysis.riskScore}/100
-                    </div>
-                  </div>
-                  <div className="text-right text-sm text-slate-300">
-                    {analysis.mode === "demo" ? "Modalità demo" : "Analisi live"}
+            <div className="mt-5 space-y-3">
+              {scanningSteps.map((step, index) => (
+                <div
+                  key={step}
+                  className={`rounded-2xl border px-4 py-3 text-sm transition ${
+                    index === scanIndex
+                      ? "border-emerald-400/40 bg-emerald-400/10 text-white"
+                      : "border-white/8 bg-white/[0.03] text-slate-400"
+                  }`}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : analysis ? (
+          <div className="mt-6 min-h-0 flex-1 overflow-auto pr-1">
+            <div className="rounded-[1.6rem] border border-white/8 bg-white/5 p-5">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Risk Score
+                  </p>
+                  <div className="mt-2 text-5xl font-semibold tracking-[-0.05em] text-white">
+                    {analysis.riskScore}/100
                   </div>
                 </div>
-                <p className="mt-4 text-sm leading-7 text-slate-200">
-                  {analysis.summary}
-                </p>
+                <div className="text-sm text-slate-300">
+                  {analysis.mode === "demo" ? "Modalita' demo" : "Analisi live"}
+                </div>
               </div>
+              <p className="mt-4 text-sm leading-7 text-slate-200">
+                {analysis.summary}
+              </p>
+            </div>
 
-              <div className={`grid gap-4 ${compact ? "xl:grid-cols-3" : ""}`}>
-                {categoryCards.map((category) => (
-                  <section
-                    key={category.key}
-                    className={`rounded-[1.5rem] border p-5 ${category.tone}`}
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <h4 className="text-lg font-semibold text-white">
-                          {category.title}
-                        </h4>
-                        <p className="mt-1 text-sm text-slate-200/80">
-                          {category.subtitle}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${category.badge}`}
-                      >
-                        {category.items.length}
-                      </span>
+            <div className="mt-4 grid gap-4 xl:grid-cols-3">
+              {panels.map((panel) => (
+                <section
+                  key={panel.key}
+                  className={`rounded-[1.5rem] border p-5 ${panel.tone}`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">
+                        {panel.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-200/80">
+                        {panel.subtitle}
+                      </p>
                     </div>
-                    <div className="mt-4 space-y-3">
-                      {category.items.length ? (
-                        category.items
-                          .slice(0, compact ? 1 : category.items.length)
-                          .map((clause, index) => (
-                            <RiskClauseCard
-                              key={`${category.key}-${clause.title}-${index}`}
-                              clause={clause}
-                              compact={compact}
-                            />
-                          ))
-                      ) : (
-                        <EmptyState
-                          text={
-                            category.key === "critical"
-                              ? "Nessuna criticità forte individuata."
-                              : category.key === "medium"
-                                ? "Nessuna area gialla rilevante."
-                                : "Nessuna clausola standard evidenziata."
-                          }
-                        />
-                      )}
-                    </div>
-                  </section>
-                ))}
-              </div>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${panel.badge}`}
+                    >
+                      {panel.items.length}
+                    </span>
+                  </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/8 bg-white/5 p-4">
-                  <h4 className="text-sm uppercase tracking-[0.22em] text-slate-400">
-                    Obblighi nascosti
-                  </h4>
-                  <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-100">
-                    {analysis.hiddenObligations
-                      .slice(0, compact ? 3 : analysis.hiddenObligations.length)
-                      .map((item, index) => (
+                  <div className="mt-4 space-y-3">
+                    {panel.items.length ? (
+                      panel.items
+                        .slice(0, compact ? 1 : panel.items.length)
+                        .map((clause, index) => (
+                          <RiskClauseCard
+                            key={`${panel.key}-${clause.title}-${index}`}
+                            clause={clause}
+                          />
+                        ))
+                    ) : (
+                      <EmptyState text={panel.empty} />
+                    )}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            <div className="mt-4 grid gap-4 xl:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-white/8 bg-white/5 p-5">
+                <h3 className="text-sm uppercase tracking-[0.22em] text-slate-400">
+                  Obblighi nascosti
+                </h3>
+                <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
+                  {analysis.hiddenObligations
+                    .slice(0, compact ? 3 : analysis.hiddenObligations.length)
+                    .map((item, index) => (
                       <li key={`${item}-${index}`} className="flex gap-3">
                         <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-400" />
                         <span>{item}</span>
                       </li>
                     ))}
-                  </ul>
-                </div>
+                </ul>
+              </div>
 
-                <div className="rounded-[1.5rem] border border-white/8 bg-white/5 p-4">
-                  <h4 className="text-sm uppercase tracking-[0.22em] text-slate-400">
-                    Mosse di negoziazione
-                  </h4>
-                  <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-100">
-                    {analysis.negotiationMoves
-                      .slice(0, compact ? 3 : analysis.negotiationMoves.length)
-                      .map((item, index) => (
+              <div className="rounded-[1.5rem] border border-white/8 bg-white/5 p-5">
+                <h3 className="text-sm uppercase tracking-[0.22em] text-slate-400">
+                  Mosse di negoziazione
+                </h3>
+                <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
+                  {analysis.negotiationMoves
+                    .slice(0, compact ? 3 : analysis.negotiationMoves.length)
+                    .map((item, index) => (
                       <li key={`${item}-${index}`} className="flex gap-3">
                         <span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-300" />
                         <span>{item}</span>
                       </li>
                     ))}
-                  </ul>
-                </div>
+                </ul>
               </div>
+            </div>
 
-              <p className="text-xs leading-6 text-slate-400">
-                {analysis.disclaimer}
-              </p>
+            <p className="mt-4 text-xs leading-6 text-slate-400">
+              {analysis.disclaimer}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 rounded-[1.6rem] border border-dashed border-white/12 bg-white/[0.03] p-6">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">
+              Output previsto
+            </p>
+            <div className="mt-5 grid gap-3">
+              {[
+                "Critical Risks con clausole potenzialmente vessatorie",
+                "Attention Required per punti da rinegoziare",
+                "Standard / Safe per sezioni non anomale",
+              ].map((item, index) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-slate-100"
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      index === 0
+                        ? "bg-red-400"
+                        : index === 1
+                          ? "bg-amber-300"
+                          : "bg-emerald-400"
+                    }`}
+                  />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="mt-8 rounded-[1.6rem] border border-dashed border-white/12 bg-white/[0.03] p-6">
-              <p className="text-sm uppercase tracking-[0.26em] text-slate-400">
-                Output previsto
-              </p>
-              <ul className="mt-4 space-y-4 text-sm leading-7 text-slate-200">
-                <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-red-400" />
-                  Critical Risks con clausole potenzialmente vessatorie.
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-amber-300" />
-                  Attention Required per punti da rinegoziare o chiarire.
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  Standard / Safe per sezioni non anomale.
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function RiskClauseCard({
-  clause,
-  compact = false,
-}: {
-  clause: Clause;
-  compact?: boolean;
-}) {
+function RiskClauseCard({ clause }: { clause: Clause }) {
   const severity = severityCopy[clause.severity];
   const Icon = severity.icon;
 
@@ -523,12 +464,8 @@ function RiskClauseCard({
     <article className="rounded-[1.3rem] border border-white/8 bg-slate-950/30 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h5 className="text-base font-medium text-white">{clause.title}</h5>
-          <p
-            className={`mt-2 text-sm text-slate-300 ${
-              compact ? "leading-6" : "leading-7"
-            }`}
-          >
+          <h4 className="text-base font-medium text-white">{clause.title}</h4>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
             {clause.explanation}
           </p>
         </div>
@@ -539,11 +476,7 @@ function RiskClauseCard({
           {severity.label}
         </span>
       </div>
-      <div
-        className={`mt-3 rounded-[1rem] border border-white/6 bg-black/20 px-4 py-3 text-sm italic text-slate-400 ${
-          compact ? "leading-6" : ""
-        }`}
-      >
+      <div className="mt-3 rounded-[1rem] border border-white/6 bg-black/20 px-4 py-3 text-sm italic leading-6 text-slate-400">
         “{clause.excerpt}”
       </div>
     </article>
