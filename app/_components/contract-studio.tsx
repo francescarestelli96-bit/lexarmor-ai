@@ -406,8 +406,16 @@ export function ContractStudio({
       key: "critical",
       title: "Critical Risks",
       subtitle: "Clausole squilibrate, penali e responsabilita' critiche",
-      tone: "border-red-400/15 bg-red-400/8",
-      badge: "bg-red-400/15 text-red-200",
+      tone:
+        "border-red-500/30 bg-[linear-gradient(180deg,rgba(127,29,29,0.28),rgba(15,23,42,0.82))]",
+      badge:
+        "bg-red-500/20 text-red-100 ring-1 ring-inset ring-red-400/30 shadow-[0_0_24px_rgba(239,68,68,0.18)]",
+      signalTone:
+        "border-red-500/35 bg-[linear-gradient(180deg,rgba(127,29,29,0.30),rgba(15,23,42,0.78))]",
+      signalText: "text-red-100",
+      dotClass:
+        "border-red-400/55 bg-red-500 shadow-[0_0_42px_rgba(239,68,68,0.55)]",
+      itemTone: "border-red-500/15 bg-[#14090d]",
       items: groupedClauses.critical,
       empty: "Nessuna criticita' elevata rilevata.",
     },
@@ -415,8 +423,16 @@ export function ContractStudio({
       key: "medium",
       title: "Attention Required",
       subtitle: "Punti da chiarire, rinegoziare o completare",
-      tone: "border-amber-300/15 bg-amber-300/8",
-      badge: "bg-amber-300/15 text-amber-100",
+      tone:
+        "border-amber-400/28 bg-[linear-gradient(180deg,rgba(120,53,15,0.24),rgba(15,23,42,0.82))]",
+      badge:
+        "bg-amber-400/18 text-amber-50 ring-1 ring-inset ring-amber-300/30 shadow-[0_0_24px_rgba(251,191,36,0.14)]",
+      signalTone:
+        "border-amber-400/35 bg-[linear-gradient(180deg,rgba(120,53,15,0.28),rgba(15,23,42,0.78))]",
+      signalText: "text-amber-50",
+      dotClass:
+        "border-amber-300/60 bg-amber-400 shadow-[0_0_42px_rgba(250,204,21,0.5)]",
+      itemTone: "border-amber-400/15 bg-[#161108]",
       items: groupedClauses.medium,
       empty: "Nessuna area intermedia particolarmente delicata.",
     },
@@ -424,12 +440,78 @@ export function ContractStudio({
       key: "safe",
       title: "Standard / Safe",
       subtitle: "Clausole coerenti o non anomale per il contesto",
-      tone: "border-emerald-400/15 bg-emerald-400/8",
-      badge: "bg-emerald-400/15 text-emerald-100",
+      tone:
+        "border-emerald-400/28 bg-[linear-gradient(180deg,rgba(6,95,70,0.24),rgba(15,23,42,0.82))]",
+      badge:
+        "bg-emerald-400/18 text-emerald-50 ring-1 ring-inset ring-emerald-300/30 shadow-[0_0_24px_rgba(16,185,129,0.16)]",
+      signalTone:
+        "border-emerald-400/35 bg-[linear-gradient(180deg,rgba(6,95,70,0.28),rgba(15,23,42,0.78))]",
+      signalText: "text-emerald-50",
+      dotClass:
+        "border-emerald-300/60 bg-emerald-400 shadow-[0_0_42px_rgba(16,185,129,0.5)]",
+      itemTone: "border-emerald-400/15 bg-[#07140f]",
       items: groupedClauses.safe,
       empty: "Nessuna clausola standard evidenziata.",
     },
   ] as const;
+
+  const smartRiskState = useMemo(() => {
+    if (!analysis) {
+      return null;
+    }
+
+    const criticalCount = groupedClauses.critical.length;
+    const mediumCount = groupedClauses.medium.length;
+    const weightedScore =
+      analysis.riskScore + criticalCount * 18 + mediumCount * 7;
+
+    if (
+      analysis.verdict === "critical" ||
+      analysis.riskScore >= 78 ||
+      criticalCount >= 2 ||
+      (criticalCount >= 1 && weightedScore >= 86)
+    ) {
+      return {
+        level: "critical" as const,
+        label: "Critical exposure",
+        scoreClass: "text-red-200",
+        frameClass:
+          "border-red-500/30 bg-[linear-gradient(180deg,rgba(127,29,29,0.28),rgba(15,23,42,0.74))]",
+        helper:
+          "Segnale rosso attivato: il punteggio e la densita' di clausole critiche indicano rischio legale o economico immediato.",
+      };
+    }
+
+    if (
+      analysis.verdict === "review" ||
+      analysis.riskScore >= 42 ||
+      criticalCount >= 1 ||
+      mediumCount >= 2 ||
+      weightedScore >= 62
+    ) {
+      return {
+        level: "medium" as const,
+        label: "Elevated review",
+        scoreClass: "text-amber-100",
+        frameClass:
+          "border-amber-400/30 bg-[linear-gradient(180deg,rgba(120,53,15,0.22),rgba(15,23,42,0.74))]",
+        helper:
+          "Segnale giallo attivato: il documento resta gestibile, ma contiene condizioni che meritano chiarimento o revisione.",
+      };
+    }
+
+    return {
+      level: "safe" as const,
+      label: "Controlled risk",
+      scoreClass: "text-emerald-200",
+      frameClass:
+        "border-emerald-400/28 bg-[linear-gradient(180deg,rgba(6,95,70,0.22),rgba(15,23,42,0.74))]",
+      helper:
+        "Segnale verde attivato: la struttura appare piu' standard e con un profilo di rischio piu' contenuto.",
+    };
+  }, [analysis, groupedClauses.critical.length, groupedClauses.medium.length]);
+
+  const riskScoreClass = smartRiskState?.scoreClass ?? "text-white";
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
@@ -672,18 +754,113 @@ export function ContractStudio({
                 ))}
               </div>
 
-              <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Risk score
+              <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(320px,380px)]">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                      Risk score
+                    </p>
+                    <div
+                      className={`mt-2 text-6xl font-semibold tracking-[-0.06em] ${riskScoreClass}`}
+                    >
+                      {analysis.riskScore}
+                      <span className="ml-1 text-3xl text-slate-500">/100</span>
+                    </div>
+                  </div>
+                  <p className="max-w-xl text-sm leading-7 text-slate-300">
+                    {analysis.summary}
                   </p>
-                  <div className="mt-2 text-6xl font-semibold tracking-[-0.06em] text-white">
-                    {analysis.riskScore}
+                </div>
+
+                <div className="rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-5 shadow-[0_20px_70px_rgba(2,6,23,0.4)]">
+                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                    Signal map
+                  </p>
+                  <div className="mt-4 flex gap-5">
+                    <div className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-5 py-6">
+                      <div className="flex flex-col items-center gap-4">
+                        {panels.map((panel) => {
+                          const isActive = smartRiskState?.level === panel.key;
+
+                          return (
+                            <div
+                              key={`signal-dot-${panel.key}`}
+                              className={`h-20 w-20 rounded-full border transition ${
+                                isActive
+                                  ? `${panel.dotClass} scale-100`
+                                  : "border-white/10 bg-slate-900/90 opacity-35"
+                              }`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      {smartRiskState ? (
+                        <div
+                          className={`rounded-[1.35rem] border p-4 ${smartRiskState.frameClass}`}
+                        >
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-300">
+                            Smart thresholding
+                          </p>
+                          <p
+                            className={`mt-3 text-2xl font-semibold tracking-[-0.04em] ${smartRiskState.scoreClass}`}
+                          >
+                            {smartRiskState.label}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-slate-200">
+                            {smartRiskState.helper}
+                          </p>
+                        </div>
+                      ) : null}
+
+                      <div className="mt-4 space-y-3">
+                        {panels.map((panel) => {
+                          const isActive = smartRiskState?.level === panel.key;
+
+                          return (
+                            <div
+                              key={`signal-${panel.key}`}
+                              className={`rounded-[1.2rem] border p-3 transition ${
+                                isActive
+                                  ? `${panel.signalTone} shadow-[0_0_0_1px_rgba(255,255,255,0.05)]`
+                                  : "border-white/8 bg-white/[0.03]"
+                              }`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div
+                                  className={`h-5 w-5 rounded-full border ${
+                                    isActive
+                                      ? panel.dotClass
+                                      : "border-white/10 bg-slate-700"
+                                  }`}
+                                />
+                                <div className="min-w-0">
+                                  <p
+                                    className={`text-sm font-semibold ${
+                                      isActive ? panel.signalText : "text-white"
+                                    }`}
+                                  >
+                                    {panel.title}
+                                  </p>
+                                  <p className="mt-1 text-xs leading-5 text-slate-300">
+                                    {panel.subtitle}
+                                  </p>
+                                </div>
+                                <div
+                                  className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${panel.badge}`}
+                                >
+                                  {panel.items.length}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <p className="max-w-xl text-sm leading-7 text-slate-300">
-                  {analysis.summary}
-                </p>
               </div>
             </div>
 
@@ -718,7 +895,7 @@ export function ContractStudio({
                         return (
                           <div
                             key={`${panel.key}-${item.title}`}
-                            className="rounded-[1.1rem] border border-white/8 bg-slate-950/30 p-4"
+                            className={`rounded-[1.1rem] border p-4 ${panel.itemTone}`}
                           >
                             <div className="flex items-start gap-3">
                               <Icon size={18} className={severity.className} />
@@ -738,7 +915,9 @@ export function ContractStudio({
                         );
                       })
                     ) : (
-                      <div className="rounded-[1.1rem] border border-white/8 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                      <div
+                        className={`rounded-[1.1rem] border px-4 py-3 text-sm text-slate-300 ${panel.itemTone}`}
+                      >
                         {panel.empty}
                       </div>
                     )}
@@ -795,19 +974,49 @@ export function ContractStudio({
               l&apos;analisi. Il sistema riconosce il tipo di documento legale e
               lo valuta con criteri coerenti al contesto.
             </p>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {[
-                "Riconoscimento del tipo di documento legale",
-                "Risk score con severita' per clausola",
-                "Sintesi di obblighi nascosti e negoziazione",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-3 text-sm text-slate-200"
-                >
-                  {item}
+            <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1fr)_280px]">
+              <div className="grid gap-3 md:grid-cols-3">
+                {[
+                  "Riconoscimento del tipo di documento legale",
+                  "Risk score con severita' per clausola",
+                  "Sintesi di obblighi nascosti e negoziazione",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-3 text-sm text-slate-200"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                  Risk signals
+                </p>
+                <div className="mt-4 space-y-3">
+                  {panels.map((panel) => (
+                    <div
+                      key={`empty-${panel.key}`}
+                      className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`h-12 w-12 rounded-full border ${panel.dotClass}`}
+                        />
+                        <div>
+                          <p className={`text-sm font-semibold ${panel.signalText}`}>
+                            {panel.title}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-300">
+                            {panel.subtitle}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         )}
