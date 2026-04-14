@@ -572,7 +572,7 @@ function PlansBoard({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid gap-4 2xl:grid-cols-[0.9fr_1.1fr]">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
             Commercial plans
@@ -668,7 +668,7 @@ function PlansBoard({
         </div>
       ) : null}
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-5 2xl:grid-cols-2">
         {planCards.map((plan) => {
           const Icon = plan.icon;
 
@@ -738,7 +738,7 @@ function SecurityBoard() {
         </h2>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid gap-5 2xl:grid-cols-[1.05fr_0.95fr]">
         <div className="grid gap-5">
           {securityCards.map((card) => {
             const Icon = card.icon;
@@ -801,7 +801,7 @@ function SegmentsBoard() {
         </h2>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid gap-5 2xl:grid-cols-[1.05fr_0.95fr]">
         <div className="grid gap-5">
           {segmentCards.map((segment) => {
             const Icon = segment.icon;

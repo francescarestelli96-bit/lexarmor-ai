@@ -514,7 +514,7 @@ export function ContractStudio({
   const riskScoreClass = smartRiskState?.scoreClass ?? "text-white";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       <section className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-6 lg:p-7">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -628,7 +628,7 @@ export function ContractStudio({
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="Incolla il testo del documento oppure carica un file..."
-          className="mt-6 h-[320px] w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 lg:h-[420px]"
+          className="mt-6 h-[320px] w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 xl:h-[420px]"
         />
 
         <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -864,7 +864,7 @@ export function ContractStudio({
               </div>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-3">
+            <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
               {panels.map((panel) => (
                 <article
                   key={panel.key}
