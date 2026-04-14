@@ -1,6 +1,13 @@
-import { stripe } from "@/lib/stripe";
+import Stripe from "stripe";
+import { readConfiguredEnv } from "@/lib/env";
 
 type PlanId = "basic" | "pro";
+
+const stripeSecretKey = readConfiguredEnv("STRIPE_SECRET_KEY");
+
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey)
+  : null;
 
 const planConfig: Record<
   PlanId,
