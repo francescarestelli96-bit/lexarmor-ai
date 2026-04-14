@@ -23,6 +23,8 @@ type AccessState = {
   remainingScans: number | null;
   expiresAt: string | null;
   label: string | null;
+  isAdmin: boolean;
+  source: "checkout" | "admin" | null;
 };
 
 type CheckoutBanner = {
@@ -118,7 +120,28 @@ const emptyAccessState: AccessState = {
   remainingScans: null,
   expiresAt: null,
   label: null,
+  isAdmin: false,
+  source: null,
 };
+
+function formatAccessStatus(access: AccessState) {
+  if (!access.hasAccess) {
+    return "Nessun accesso attivo";
+  }
+
+  if (access.isAdmin) {
+    return "Admin test access";
+  }
+
+  if (access.plan === "basic") {
+    const remaining = access.remainingScans ?? 0;
+    return remaining === 1
+      ? "Basic attivo · 1 analisi disponibile"
+      : `Basic attivo · ${remaining} analisi disponibili`;
+  }
+
+  return "Pro attivo";
+}
 
 function isTabId(value: string | null): value is TabId {
   return (
@@ -188,6 +211,7 @@ export function LexArmorControlCenter() {
     () => readLocationState().tab ?? "analysis"
   );
   const [access, setAccess] = useState<AccessState>(emptyAccessState);
+  const [adminConfigured, setAdminConfigured] = useState(false);
   const [accessLoading, setAccessLoading] = useState(true);
   const [checkoutBannerCopy, setCheckoutBannerCopy] =
     useState<CheckoutBanner | null>(null);
@@ -210,6 +234,7 @@ export function LexArmorControlCenter() {
         const data = (await response.json()) as {
           error?: string;
           access?: AccessState;
+          adminConfigured?: boolean;
         };
 
         if (cancelled) {
@@ -218,6 +243,7 @@ export function LexArmorControlCenter() {
 
         if (response.ok && data.access) {
           setAccess(data.access);
+          setAdminConfigured(Boolean(data.adminConfigured));
           setCheckoutBannerCopy(
             buildCheckoutSuccessBanner(location.checkoutPlan ?? "basic")
           );
@@ -240,13 +266,17 @@ export function LexArmorControlCenter() {
       }
 
       const response = await fetch("/api/access");
-      const data = (await response.json()) as { access?: AccessState };
+      const data = (await response.json()) as {
+        access?: AccessState;
+        adminConfigured?: boolean;
+      };
 
       if (cancelled) {
         return;
       }
 
       setAccess(data.access ?? emptyAccessState);
+      setAdminConfigured(Boolean(data.adminConfigured));
 
       if (location.checkoutState === "cancel") {
         setCheckoutBannerCopy({
@@ -351,6 +381,7 @@ export function LexArmorControlCenter() {
           {activeTab === "plans" ? (
             <PlansBoard
               access={access}
+              adminConfigured={adminConfigured}
               accessLoading={accessLoading}
               onAccessChange={setAccess}
               onCheckoutBannerChange={setCheckoutBannerCopy}
@@ -366,17 +397,22 @@ export function LexArmorControlCenter() {
 
 function PlansBoard({
   access,
+  adminConfigured,
   accessLoading,
   onAccessChange,
   onCheckoutBannerChange,
 }: {
   access: AccessState;
+  adminConfigured: boolean;
   accessLoading: boolean;
   onAccessChange: (access: AccessState) => void;
   onCheckoutBannerChange: (banner: CheckoutBanner | null) => void;
 }) {
   const [pendingPlan, setPendingPlan] = useState<PlanId | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
+  const [adminKey, setAdminKey] = useState("");
+  const [adminError, setAdminError] = useState("");
+  const [adminPending, setAdminPending] = useState(false);
 
   async function startCheckout(planId: PlanId) {
     setPendingPlan(planId);
@@ -414,6 +450,77 @@ function PlansBoard({
     }
   }
 
+  async function activateAdminAccess() {
+    setAdminPending(true);
+    setAdminError("");
+    setCheckoutError("");
+    onCheckoutBannerChange(null);
+
+    try {
+      const response = await fetch("/api/admin/access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ key: adminKey }),
+      });
+
+      const data = (await response.json()) as {
+        error?: string;
+        access?: AccessState;
+      };
+
+      if (!response.ok || !data.access) {
+        throw new Error(
+          data.error || "Non sono riuscito ad attivare l'accesso admin."
+        );
+      }
+
+      onAccessChange(data.access);
+      onCheckoutBannerChange({
+        tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
+        title: "Accesso admin attivato.",
+        body:
+          "Puoi testare il workspace senza passare da Stripe su questo browser.",
+      });
+      setAdminKey("");
+    } catch (error) {
+      setAdminError(
+        error instanceof Error
+          ? error.message
+          : "Accesso admin non disponibile. Riprova tra poco."
+      );
+    } finally {
+      setAdminPending(false);
+    }
+  }
+
+  async function clearAdminAccess() {
+    setAdminPending(true);
+    setAdminError("");
+    onCheckoutBannerChange(null);
+
+    try {
+      const response = await fetch("/api/admin/access", {
+        method: "DELETE",
+      });
+
+      const data = (await response.json()) as { access?: AccessState };
+      onAccessChange(data.access ?? emptyAccessState);
+      onCheckoutBannerChange({
+        tone: "border-white/10 bg-white/[0.04] text-slate-100",
+        title: "Accesso admin rimosso.",
+        body: "Il browser e' tornato allo stato standard del workspace.",
+      });
+    } catch {
+      setAdminError(
+        "Non sono riuscito a rimuovere l'accesso admin. Riprova tra poco."
+      );
+    } finally {
+      setAdminPending(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
@@ -435,17 +542,13 @@ function PlansBoard({
             Access status
           </p>
           <div className="mt-3 text-lg font-semibold text-white">
-            {accessLoading
-              ? "Verifica accesso in corso..."
-              : access.hasAccess
-                ? access.plan === "basic"
-                  ? `Basic attivo · ${access.remainingScans ?? 0} analisi disponibili`
-                  : "Pro attivo"
-                : "Nessun accesso attivo"}
+            {accessLoading ? "Verifica accesso in corso..." : formatAccessStatus(access)}
           </div>
           <p className="mt-2 text-sm leading-7 text-slate-300">
             {access.hasAccess
-              ? "Puoi tornare subito nel pannello Analysis e usare il workspace."
+              ? access.isAdmin
+                ? "Accesso interno attivo per testare il prodotto senza acquisto."
+                : "Puoi tornare subito nel pannello Analysis e usare il workspace."
               : "Completa il checkout e l'accesso viene attivato automaticamente su questo browser."}
           </p>
           {!accessLoading && access.hasAccess ? (
@@ -454,8 +557,52 @@ function PlansBoard({
               onClick={() => onAccessChange(access)}
               className="mt-4 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100"
             >
-              Accesso rilevato
+              {access.isAdmin ? "Accesso admin rilevato" : "Accesso rilevato"}
             </button>
+          ) : null}
+
+          {adminConfigured ? (
+            <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-slate-950/40 p-4">
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                Internal testing
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-white">
+                Accesso admin per test
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Attivalo solo sul tuo browser per provare l&apos;esperienza completa
+                senza passare da Stripe.
+              </p>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <input
+                  type="password"
+                  value={adminKey}
+                  onChange={(event) => setAdminKey(event.target.value)}
+                  placeholder="Inserisci la chiave admin"
+                  className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40"
+                />
+                <button
+                  type="button"
+                  onClick={() => void activateAdminAccess()}
+                  disabled={adminPending || !adminKey.trim()}
+                  className="rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {adminPending ? "Attivazione..." : "Attiva accesso admin"}
+                </button>
+              </div>
+
+              {access.isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => void clearAdminAccess()}
+                  disabled={adminPending}
+                  className="mt-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Disattiva accesso admin
+                </button>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
@@ -463,6 +610,12 @@ function PlansBoard({
       {checkoutError ? (
         <div className="rounded-[1.4rem] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
           {checkoutError}
+        </div>
+      ) : null}
+
+      {adminError ? (
+        <div className="rounded-[1.4rem] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+          {adminError}
         </div>
       ) : null}
 

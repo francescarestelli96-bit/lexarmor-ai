@@ -68,6 +68,7 @@ export async function POST(request: Request) {
         expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
         checkoutSessionId: session.id,
         issuedAt: new Date().toISOString(),
+        source: "checkout",
       };
     } else {
       const subscription =
@@ -99,11 +100,13 @@ export async function POST(request: Request) {
         checkoutSessionId: session.id,
         subscriptionId: subscription.id,
         issuedAt: new Date().toISOString(),
+        source: "checkout",
       };
     }
 
     const response = NextResponse.json({
       access: toClientAccessState(access),
+      adminConfigured: Boolean(readConfiguredEnv("LEXARMOR_ADMIN_KEY")),
     });
 
     response.cookies.set(

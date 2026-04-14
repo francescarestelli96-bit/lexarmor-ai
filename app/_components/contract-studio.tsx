@@ -28,6 +28,8 @@ type AccessState = {
   remainingScans: number | null;
   expiresAt: string | null;
   label: string | null;
+  isAdmin: boolean;
+  source: "checkout" | "admin" | null;
 };
 
 type Clause = {
@@ -122,11 +124,17 @@ const emptyAccessState: AccessState = {
   remainingScans: null,
   expiresAt: null,
   label: null,
+  isAdmin: false,
+  source: null,
 };
 
 function formatAccessLabel(access: AccessState) {
   if (!access.hasAccess || !access.plan) {
     return "Nessun accesso attivo";
+  }
+
+  if (access.isAdmin) {
+    return "Admin test access";
   }
 
   if (access.plan === "basic") {

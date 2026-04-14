@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { readConfiguredEnv } from "@/lib/env";
 
 export type PlanId = "basic" | "pro";
+export type AccessSource = "checkout" | "admin";
 
 export type StoredAccessState = {
   plan: PlanId;
@@ -10,6 +11,7 @@ export type StoredAccessState = {
   checkoutSessionId: string;
   subscriptionId?: string;
   issuedAt: string;
+  source?: AccessSource;
 };
 
 export type ClientAccessState = {
@@ -18,6 +20,8 @@ export type ClientAccessState = {
   remainingScans: number | null;
   expiresAt: string | null;
   label: string | null;
+  isAdmin: boolean;
+  source: AccessSource | null;
 };
 
 export const ACCESS_COOKIE_NAME = "lexarmor_access";
@@ -28,14 +32,21 @@ const EMPTY_ACCESS_STATE: ClientAccessState = {
   remainingScans: null,
   expiresAt: null,
   label: null,
+  isAdmin: false,
+  source: null,
 };
 
 function getSigningSecret() {
   return (
     readConfiguredEnv("LEXARMOR_ACCESS_SECRET") ||
     readConfiguredEnv("STRIPE_SECRET_KEY") ||
+    readConfiguredEnv("LEXARMOR_ADMIN_KEY") ||
     ""
   );
+}
+
+function isAccessSource(value: unknown): value is AccessSource {
+  return value === "checkout" || value === "admin";
 }
 
 function signPayload(payload: string) {
@@ -81,6 +92,7 @@ export function readAccessToken(token: string | undefined | null) {
       typeof parsed.expiresAt !== "string" ||
       typeof parsed.checkoutSessionId !== "string" ||
       typeof parsed.issuedAt !== "string" ||
+      (parsed.source !== undefined && !isAccessSource(parsed.source)) ||
       (parsed.remainingScans !== null &&
         (typeof parsed.remainingScans !== "number" || parsed.remainingScans < 0))
     ) {
@@ -120,12 +132,22 @@ export function toClientAccessState(
     return EMPTY_ACCESS_STATE;
   }
 
+  const source = access.source ?? "checkout";
+  const label =
+    source === "admin"
+      ? "Admin test access"
+      : access.plan === "basic"
+        ? "Basic attivo"
+        : "Pro attivo";
+
   return {
     hasAccess: true,
     plan: access.plan,
     remainingScans: access.plan === "basic" ? access.remainingScans ?? 0 : null,
     expiresAt: access.expiresAt,
-    label: access.plan === "basic" ? "Basic attivo" : "Pro attivo",
+    label,
+    isAdmin: source === "admin",
+    source,
   };
 }
 
@@ -160,5 +182,28 @@ export function getCookieOptions(access: StoredAccessState) {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: getCookieMaxAge(access),
+  };
+}
+
+export function getClearedCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 0,
+  };
+}
+
+export function createAdminAccessState() {
+  const now = new Date();
+
+  return {
+    plan: "pro" as const,
+    remainingScans: null,
+    expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    checkoutSessionId: "admin-access",
+    issuedAt: now.toISOString(),
+    source: "admin" as const,
   };
 }
