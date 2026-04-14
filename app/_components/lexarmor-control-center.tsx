@@ -33,11 +33,17 @@ type CheckoutBanner = {
   body: string;
 };
 
-const tabs: Array<{ id: TabId; label: string }> = [
+const fullTabs: Array<{ id: TabId; label: string }> = [
   { id: "analysis", label: "Analysis" },
   { id: "plans", label: "Plans" },
   { id: "security", label: "Security" },
   { id: "segments", label: "Segments" },
+];
+
+const demoTabs: Array<{ id: TabId; label: string }> = [
+  { id: "analysis", label: "Demo Analysis" },
+  { id: "security", label: "Security" },
+  { id: "segments", label: "Use Cases" },
 ];
 
 const planCards = [
@@ -124,6 +130,16 @@ const emptyAccessState: AccessState = {
   source: null,
 };
 
+const demoAccessState: AccessState = {
+  hasAccess: true,
+  plan: "pro",
+  remainingScans: null,
+  expiresAt: null,
+  label: "Demo access",
+  isAdmin: false,
+  source: "admin",
+};
+
 function formatAccessStatus(access: AccessState) {
   if (!access.hasAccess) {
     return "Nessun accesso attivo";
@@ -206,17 +222,42 @@ function buildCheckoutSuccessBanner(plan: PlanId): CheckoutBanner {
       };
 }
 
-export function LexArmorControlCenter() {
+const demoBanner: CheckoutBanner = {
+  tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
+  title: "Demo mode attiva.",
+  body:
+    "Questa workspace e' ottimizzata per registrare video marketing: analisi simulata, nessun checkout richiesto e narrativa stabile.",
+};
+
+export function LexArmorControlCenter({
+  demoMode = false,
+}: {
+  demoMode?: boolean;
+}) {
+  const tabs = demoMode ? demoTabs : fullTabs;
   const [activeTab, setActiveTab] = useState<TabId>(
-    () => readLocationState().tab ?? "analysis"
+    () => {
+      const detectedTab = readLocationState().tab ?? "analysis";
+      if (demoMode && detectedTab === "plans") {
+        return "analysis";
+      }
+
+      return detectedTab;
+    }
   );
-  const [access, setAccess] = useState<AccessState>(emptyAccessState);
-  const [adminConfigured, setAdminConfigured] = useState(false);
-  const [accessLoading, setAccessLoading] = useState(true);
+  const [access, setAccess] = useState<AccessState>(
+    demoMode ? demoAccessState : emptyAccessState
+  );
+  const [adminConfigured, setAdminConfigured] = useState(demoMode);
+  const [accessLoading, setAccessLoading] = useState(!demoMode);
   const [checkoutBannerCopy, setCheckoutBannerCopy] =
-    useState<CheckoutBanner | null>(null);
+    useState<CheckoutBanner | null>(demoMode ? demoBanner : null);
 
   useEffect(() => {
+    if (demoMode) {
+      return;
+    }
+
     let cancelled = false;
 
     async function syncState() {
@@ -297,7 +338,7 @@ export function LexArmorControlCenter() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [demoMode]);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.06),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.05),transparent_22%),#020817] text-white">
@@ -313,12 +354,17 @@ export function LexArmorControlCenter() {
                   LexArmor
                 </div>
                 <div className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                  Contract risk analysis
+                  {demoMode ? "Social demo workspace" : "Contract risk analysis"}
                 </div>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              {demoMode ? (
+                <span className="rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
+                  Demo Reel Mode
+                </span>
+              ) : null}
               <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
                 Encrypted transmission
               </span>
@@ -374,11 +420,14 @@ export function LexArmorControlCenter() {
             <ContractStudio
               access={access}
               accessLoading={accessLoading}
-              onOpenPlans={() => setActiveTab("plans")}
+              onOpenPlans={() =>
+                setActiveTab(demoMode ? "analysis" : "plans")
+              }
               onAccessChange={setAccess}
+              demoMode={demoMode}
             />
           ) : null}
-          {activeTab === "plans" ? (
+          {activeTab === "plans" && !demoMode ? (
             <PlansBoard
               access={access}
               adminConfigured={adminConfigured}

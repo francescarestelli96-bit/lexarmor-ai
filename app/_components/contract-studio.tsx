@@ -57,6 +57,7 @@ type ContractStudioProps = {
   accessLoading: boolean;
   onOpenPlans: () => void;
   onAccessChange: (access: AccessState) => void;
+  demoMode?: boolean;
 };
 
 const verdictCopy = {
@@ -100,6 +101,73 @@ const scanningSteps = [
   "Lettura di rischi, obblighi e punti critici da approfondire",
   "Calcolo del risk score e della sintesi operativa",
 ];
+
+const demoScriptText = `SCRITTURA PROFESSIONALE TRA COMMITTENTE E CONSULENTE
+
+Tra ALFA SRL (Committente) e Mario Rossi (Consulente) si conviene quanto segue:
+1) Oggetto: supporto strategico e operativo per 6 mesi.
+2) Corrispettivo: euro 1.500 mensili, pagamento a 90 giorni data fattura.
+3) Penale: in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilita'.
+4) Non concorrenza: divieto di collaborare con concorrenti per 24 mesi senza compenso dedicato.
+5) Responsabilita': il Consulente risponde per ogni danno diretto e indiretto, senza limiti.
+6) Foro competente esclusivo: Milano.
+7) Riservatezza: obbligo per entrambe le parti per 5 anni.
+8) Trattamento dati: le parti dichiarano di operare nel rispetto delle norme applicabili.`;
+
+const demoAnalysisPayload: AnalysisResponse = {
+  contractType: "Contratto di consulenza professionale",
+  parties: ["ALFA SRL", "Mario Rossi"],
+  summary:
+    "Documento professionale con diverse clausole sbilanciate a sfavore del consulente. Le aree piu' critiche riguardano penale, non concorrenza e responsabilita' illimitata. Struttura recuperabile con revisione mirata delle clausole economiche e di rischio.",
+  verdict: "review",
+  riskScore: 78,
+  clauses: [
+    {
+      title: "Penale eccessiva su recesso anticipato",
+      severity: "critical",
+      explanation:
+        "Penale pari a 6 mensilita' senza criterio di proporzionalita'. Clausola potenzialmente squilibrata rispetto all'interesse del committente.",
+      excerpt:
+        "in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilita'",
+    },
+    {
+      title: "Non concorrenza post-contrattuale senza corrispettivo",
+      severity: "critical",
+      explanation:
+        "Vincolo di 24 mesi senza compenso dedicato: forte rischio di invalidita' o riduzione, da rinegoziare in durata, perimetro e corrispettivo.",
+      excerpt:
+        "divieto di collaborare con concorrenti per 24 mesi senza compenso dedicato",
+    },
+    {
+      title: "Responsabilita' illimitata su danni indiretti",
+      severity: "medium",
+      explanation:
+        "Assunzione di rischio eccessiva: manca un tetto massimo e manca distinzione tra colpa lieve, grave e dolo.",
+      excerpt:
+        "il Consulente risponde per ogni danno diretto e indiretto, senza limiti",
+    },
+    {
+      title: "Riservatezza bilaterale standard",
+      severity: "safe",
+      explanation:
+        "Clausola di riservatezza coerente con contratti professionali, se mantenuta bilaterale e ragionevole per durata e oggetto.",
+      excerpt: "obbligo per entrambe le parti per 5 anni",
+    },
+  ],
+  hiddenObligations: [
+    "Il pagamento a 90 giorni espone il consulente a un carico finanziario non neutro.",
+    "La combinazione tra penale e non concorrenza riduce fortemente la liberta' professionale.",
+    "La responsabilita' illimitata puo' trasferire sul consulente rischi estranei al compenso pattuito.",
+  ],
+  negotiationMoves: [
+    "Ridurre la penale con criterio progressivo o limite massimo ragionevole.",
+    "Inserire compenso specifico per non concorrenza e ridurre durata/ambito territoriale.",
+    "Introdurre cap di responsabilita' legato al valore complessivo del contratto.",
+    "Portare termini pagamento da 90 a 30 giorni o inserire interessi automatici per ritardo.",
+  ],
+  disclaimer:
+    "Analisi basata su AI a scopo informativo, non sostituisce il parere di un avvocato abilitato",
+};
 
 const complianceBadges = [
   {
@@ -152,6 +220,7 @@ export function ContractStudio({
   accessLoading,
   onOpenPlans,
   onAccessChange,
+  demoMode = false,
 }: ContractStudioProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState("");
@@ -234,6 +303,27 @@ export function ContractStudio({
   }
 
   async function analyzeContract() {
+    if (demoMode) {
+      setIsPending(true);
+      setError("");
+      setAnalysis(null);
+      setUploadNotice("");
+
+      try {
+        await new Promise((resolve) => window.setTimeout(resolve, 2800));
+        startTransition(() => {
+          setAnalysis(demoAnalysisPayload);
+        });
+        setUploadNotice(
+          "Demo completata. Questo output e' simulato per presentazione marketing."
+        );
+      } finally {
+        setIsPending(false);
+      }
+
+      return;
+    }
+
     if (!access.hasAccess) {
       onOpenPlans();
       return;
@@ -434,6 +524,24 @@ export function ContractStudio({
           </div>
         ) : null}
 
+        {demoMode ? (
+          <button
+            type="button"
+            onClick={() => {
+              setText(demoScriptText);
+              setAnalysis(null);
+              setError("");
+              setUploadError("");
+              setUploadNotice(
+                "Script demo caricato. Premi 'Avvia analisi demo' per la registrazione."
+              );
+            }}
+            className="mt-4 rounded-full border border-sky-400/25 bg-sky-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-sky-200 transition hover:bg-sky-400/20"
+          >
+            Carica script demo per video
+          </button>
+        ) : null}
+
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
@@ -458,7 +566,7 @@ export function ContractStudio({
             })}
           </div>
 
-          {access.hasAccess ? (
+          {access.hasAccess || demoMode ? (
             <button
               type="button"
               disabled={isPending || text.trim().length < 80}
@@ -472,7 +580,7 @@ export function ContractStudio({
                 </>
               ) : (
                 <>
-                  Analizza documento
+                  {demoMode ? "Avvia analisi demo" : "Analizza documento"}
                   <ArrowRight size={16} />
                 </>
               )}
@@ -495,7 +603,7 @@ export function ContractStudio({
           </div>
         ) : null}
 
-        {!accessLoading && !access.hasAccess ? (
+        {!accessLoading && !access.hasAccess && !demoMode ? (
           <div className="mt-4 rounded-[1.2rem] border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-200">
             Per analizzare il documento serve un accesso attivo. Il pass{" "}
             <span className="font-semibold text-white">Basic</span> sblocca 1
