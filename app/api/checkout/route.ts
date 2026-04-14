@@ -1,9 +1,12 @@
 import Stripe from "stripe";
+import { readConfiguredEnv } from "@/lib/env";
 
 type PlanId = "basic" | "pro";
 
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+const stripeSecretKey = readConfiguredEnv("STRIPE_SECRET_KEY");
+
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey)
   : null;
 
 const planConfig: Record<

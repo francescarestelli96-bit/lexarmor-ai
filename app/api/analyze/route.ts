@@ -10,6 +10,7 @@ import {
   readAccessToken,
   toClientAccessState,
 } from "@/lib/access";
+import { readConfiguredEnv } from "@/lib/env";
 
 type ClauseSeverity = "critical" | "medium" | "safe";
 type Verdict = "critical" | "review" | "safe";
@@ -31,8 +32,10 @@ type AnalysisModelPayload = {
   disclaimer: string;
 };
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const openaiApiKey = readConfiguredEnv("OPENAI_API_KEY");
+
+const openai = openaiApiKey
+  ? new OpenAI({ apiKey: openaiApiKey })
   : null;
 
 function normalizeJson(raw: string) {

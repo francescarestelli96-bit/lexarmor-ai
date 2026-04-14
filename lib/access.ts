@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { readConfiguredEnv } from "@/lib/env";
 
 export type PlanId = "basic" | "pro";
 
@@ -30,7 +31,11 @@ const EMPTY_ACCESS_STATE: ClientAccessState = {
 };
 
 function getSigningSecret() {
-  return process.env.LEXARMOR_ACCESS_SECRET || process.env.STRIPE_SECRET_KEY || "";
+  return (
+    readConfiguredEnv("LEXARMOR_ACCESS_SECRET") ||
+    readConfiguredEnv("STRIPE_SECRET_KEY") ||
+    ""
+  );
 }
 
 function signPayload(payload: string) {

@@ -1,7 +1,6 @@
 import { Buffer } from "node:buffer";
 import JSZip from "jszip";
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
 
 type ExtractedDocument = {
   text: string;
@@ -43,6 +42,14 @@ function stripRtf(text: string) {
 }
 
 async function extractPdf(buffer: Buffer) {
+  if (typeof globalThis.DOMMatrix === "undefined") {
+    const DOMMatrixModule = await import("@thednp/dommatrix");
+    const DOMMatrixPolyfill = DOMMatrixModule.default as unknown as typeof DOMMatrix;
+
+    globalThis.DOMMatrix = DOMMatrixPolyfill;
+  }
+
+  const { PDFParse } = await import("pdf-parse");
   const parser = new PDFParse({ data: buffer });
 
   try {
