@@ -754,7 +754,7 @@ export function ContractStudio({
                 ))}
               </div>
 
-              <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(320px,380px)]">
+              <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.9fr)_minmax(340px,400px)]">
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
@@ -974,16 +974,16 @@ export function ContractStudio({
               l&apos;analisi. Il sistema riconosce il tipo di documento legale e
               lo valuta con criteri coerenti al contesto.
             </p>
-            <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1fr)_280px]">
-              <div className="grid gap-3 md:grid-cols-3">
+            <div className="mt-5 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
                 {[
-                  "Riconoscimento del tipo di documento legale",
-                  "Risk score con severita' per clausola",
-                  "Sintesi di obblighi nascosti e negoziazione",
+                  "Classificazione del documento legale",
+                  "Risk score e severita' operative",
+                  "Obblighi nascosti e negoziazione",
                 ].map((item) => (
                   <div
                     key={item}
-                    className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-3 text-sm text-slate-200"
+                    className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-4 text-sm leading-6 text-slate-200"
                   >
                     {item}
                   </div>
