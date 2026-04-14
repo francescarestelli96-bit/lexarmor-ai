@@ -4,6 +4,7 @@ import { readConfiguredEnv } from "@/lib/env";
 type PlanId = "basic" | "pro";
 
 const stripeSecretKey = readConfiguredEnv("STRIPE_SECRET_KEY");
+const openaiApiKey = readConfiguredEnv("OPENAI_API_KEY");
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey)
@@ -47,6 +48,16 @@ export async function POST(request: Request) {
         {
           error:
             "Stripe non e' configurato. Aggiungi STRIPE_SECRET_KEY nelle variabili ambiente.",
+        },
+        { status: 503 }
+      );
+    }
+
+    if (!openaiApiKey) {
+      return Response.json(
+        {
+          error:
+            "LexArmor non e' ancora operativo sul live: manca OPENAI_API_KEY su Vercel. Non apro il checkout per evitare addebiti inutili.",
         },
         { status: 503 }
       );
