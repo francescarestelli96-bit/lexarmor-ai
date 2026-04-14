@@ -1,10 +1,22 @@
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import {
+  ACCESS_COOKIE_NAME,
+  consumeAccess,
+  createAccessToken,
+  getCookieOptions,
+  isAccessActive,
+  readAccessToken,
+  toClientAccessState,
+} from "@/lib/access";
 
 type ClauseSeverity = "critical" | "medium" | "safe";
 type Verdict = "critical" | "review" | "safe";
 
-type AnalysisPayload = {
-  mode: "live" | "demo";
+type AnalysisModelPayload = {
+  contractType: string;
+  parties: string[];
   summary: string;
   verdict: Verdict;
   riskScore: number;
@@ -23,54 +35,11 @@ const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
-const demoPayload: AnalysisPayload = {
-  mode: "demo",
-  summary:
-    "Questo testo contiene diverse clausole sbilanciate a favore del locatore: rinuncia preventiva a tutele, recesso molto punitivo e tempi di restituzione della cauzione eccessivi.",
-  verdict: "critical",
-  riskScore: 82,
-  clauses: [
-    {
-      title: "Rinuncia preventiva ai vizi dell'immobile",
-      severity: "critical",
-      explanation:
-        "Ti fa perdere protezione anche se scopri problemi seri dopo la firma, come infiltrazioni o impianti difettosi.",
-      excerpt:
-        "Il conduttore rinuncia espressamente a qualsiasi richiesta di rimborso per vizi dell'immobile.",
-    },
-    {
-      title: "Recesso anticipato con penale estrema",
-      severity: "critical",
-      explanation:
-        "Se esci prima, rischi di restare obbligato a pagare quasi tutto il contratto anche senza usare più l'immobile.",
-      excerpt:
-        "Il conduttore restera' obbligato al pagamento di tutti i canoni residui fino alla scadenza naturale.",
-    },
-    {
-      title: "Restituzione cauzione troppo lenta",
-      severity: "medium",
-      explanation:
-        "180 giorni sono un tempo molto lungo e lasciano troppo margine discrezionale al locatore.",
-      excerpt:
-        "Il deposito cauzionale verra' restituito entro 180 giorni dal rilascio dell'immobile.",
-    },
-  ],
-  hiddenObligations: [
-    "Accetti modifiche unilaterali al regolamento applicabile all'immobile.",
-    "Potresti sostenere costi e canoni anche dopo il rilascio anticipato.",
-    "Il foro scelto dal locatore puo' rendere piu' costosa una contestazione.",
-  ],
-  negotiationMoves: [
-    "Chiedi di eliminare la rinuncia generale ai vizi e di limitare la clausola ai difetti gia' noti e documentati.",
-    "Proponi un tetto massimo alla penale di recesso, ad esempio 2 o 3 mensilita'.",
-    "Riduci il termine di restituzione della cauzione a 30 giorni con motivazione scritta per eventuali trattenute.",
-  ],
-  disclaimer:
-    "Analisi informativa, non sostituisce una revisione legale professionale. La piattaforma non salva il testo inviato; in demo mode uso euristiche locali per non bloccare l'esperienza.",
-};
-
 function normalizeJson(raw: string) {
-  return raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "");
+  return raw
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "");
 }
 
 function isClauseSeverity(value: unknown): value is ClauseSeverity {
@@ -81,14 +50,16 @@ function isVerdict(value: unknown): value is Verdict {
   return value === "critical" || value === "review" || value === "safe";
 }
 
-function sanitizePayload(payload: unknown): AnalysisPayload {
+function sanitizePayload(payload: unknown): AnalysisModelPayload {
   if (!payload || typeof payload !== "object") {
     throw new Error("Formato analisi non valido.");
   }
 
-  const data = payload as Partial<AnalysisPayload>;
+  const data = payload as Partial<AnalysisModelPayload>;
 
   if (
+    typeof data.contractType !== "string" ||
+    !Array.isArray(data.parties) ||
     typeof data.summary !== "string" ||
     !isVerdict(data.verdict) ||
     typeof data.riskScore !== "number" ||
@@ -101,12 +72,17 @@ function sanitizePayload(payload: unknown): AnalysisPayload {
   }
 
   return {
-    mode: "live",
-    summary: data.summary,
+    contractType: data.contractType.trim(),
+    parties: data.parties
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .slice(0, 4),
+    summary: data.summary.trim(),
     verdict: data.verdict,
     riskScore: Math.max(0, Math.min(100, Math.round(data.riskScore))),
     clauses: data.clauses.slice(0, 4).map((clause) => {
-      const candidate = clause as AnalysisPayload["clauses"][number];
+      const candidate = clause as AnalysisModelPayload["clauses"][number];
 
       if (
         !candidate ||
@@ -118,24 +94,35 @@ function sanitizePayload(payload: unknown): AnalysisPayload {
         throw new Error("Clausola non valida.");
       }
 
-      return candidate;
+      return {
+        title: candidate.title.trim(),
+        severity: candidate.severity,
+        explanation: candidate.explanation.trim(),
+        excerpt: candidate.excerpt.trim(),
+      };
     }),
     hiddenObligations: data.hiddenObligations
       .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean)
       .slice(0, 4),
     negotiationMoves: data.negotiationMoves
       .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean)
       .slice(0, 4),
-    disclaimer: data.disclaimer,
+    disclaimer: data.disclaimer.trim(),
   };
 }
 
 function buildPrompt(contractText: string) {
   return `
-Analizza il seguente contratto in italiano semplice. Non fare premesse inutili.
+Analizza il seguente documento legale in italiano semplice. Non fare premesse inutili.
 
 Restituisci SOLO JSON valido con questa shape:
 {
+  "contractType": "string",
+  "parties": ["string"],
   "summary": "string",
   "verdict": "critical" | "review" | "safe",
   "riskScore": number,
@@ -153,41 +140,72 @@ Restituisci SOLO JSON valido con questa shape:
 }
 
 Regole:
+- identifica prima il tipo reale di documento e le parti coinvolte
+- usa i ruoli e i nomi presenti nel testo; non inventare locatore, conduttore, immobile o affitto se il documento non e' chiaramente immobiliare
 - massimo 4 clausole
-- excerpt brevi, testuali e fedeli al contratto
+- excerpt brevi, testuali e fedeli al documento
 - riskScore da 0 a 100
+- se il documento e' artistico, professionale o di prestazione, analizza compenso, penali, registrazioni/riprese, forza maggiore, autorizzazioni, responsabilita', annullamento, foro e obblighi amministrativi
+- se il documento e' civile, penale, regolatorio o di compliance, usa il lessico pertinente e segnala punti critici, obblighi, rischi procedurali, responsabilita' e passaggi che richiedono approfondimento professionale
+- classifica come "safe" le clausole standard o equilibrate per quel tipo di documento
 - niente markdown
 - niente testo fuori dal JSON
 
-Contratto:
+Documento:
 ${contractText}
 `;
 }
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const currentAccess = readAccessToken(
+      cookieStore.get(ACCESS_COOKIE_NAME)?.value
+    );
+
+    if (!isAccessActive(currentAccess)) {
+      return NextResponse.json(
+        {
+          error:
+            "Per avviare l'analisi serve un accesso attivo. Scegli Basic o Pro dal pannello Plans.",
+          code: "payment_required",
+          access: toClientAccessState(currentAccess),
+        },
+        { status: 402 }
+      );
+    }
+
     const body = (await request.json()) as { contractText?: string };
     const contractText = body.contractText?.trim();
 
     if (!contractText || contractText.length < 80) {
-      return Response.json(
-        { error: "Incolla almeno 80 caratteri di contratto per ottenere un'analisi utile." },
+      return NextResponse.json(
+        {
+          error:
+            "Inserisci almeno 80 caratteri di contenuto per ottenere un'analisi utile.",
+        },
         { status: 400 }
       );
     }
 
     if (!openai) {
-      return Response.json(demoPayload);
+      return NextResponse.json(
+        {
+          error:
+            "OpenAI non e' configurato sul server. Inserisci OPENAI_API_KEY nelle variabili ambiente.",
+        },
+        { status: 503 }
+      );
     }
 
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
-      temperature: 0.3,
+      temperature: 0.1,
       messages: [
         {
           role: "system",
           content:
-            "Sei un contract reviewer preciso. Evidenzi rischi, obblighi nascosti e possibili mosse di negoziazione con linguaggio chiaro.",
+            "Sei un legal document reviewer esperto. Devi riconoscere correttamente il tipo di documento, usare il lessico pertinente al contesto e spiegare rischi, obblighi nascosti e leve di negoziazione o approfondimento in italiano chiaro.",
         },
         {
           role: "user",
@@ -204,15 +222,32 @@ export async function POST(request: Request) {
 
     const parsed = JSON.parse(normalizeJson(content));
     const payload = sanitizePayload(parsed);
+    const grantedAccess = currentAccess as NonNullable<typeof currentAccess>;
+    const updatedAccess = consumeAccess(grantedAccess);
 
-    return Response.json(payload);
+    const response = NextResponse.json({
+      ...payload,
+      access: toClientAccessState(updatedAccess),
+    });
+
+    if (updatedAccess) {
+      response.cookies.set(
+        ACCESS_COOKIE_NAME,
+        createAccessToken(updatedAccess),
+        getCookieOptions(updatedAccess)
+      );
+    } else {
+      response.cookies.delete(ACCESS_COOKIE_NAME);
+    }
+
+    return response;
   } catch (error) {
     console.error("Analyze route error", error);
 
-    return Response.json(
+    return NextResponse.json(
       {
         error:
-          "Non sono riuscito a completare l'analisi. Controlla le variabili ambiente oppure riprova tra poco.",
+          "Non sono riuscito a completare l'analisi. Controlla la configurazione oppure riprova tra poco.",
       },
       { status: 500 }
     );

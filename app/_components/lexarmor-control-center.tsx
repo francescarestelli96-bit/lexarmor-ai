@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   Building2,
@@ -15,6 +15,21 @@ import {
 import { ContractStudio } from "@/app/_components/contract-studio";
 
 type TabId = "analysis" | "plans" | "security" | "segments";
+type PlanId = "basic" | "pro";
+
+type AccessState = {
+  hasAccess: boolean;
+  plan: PlanId | null;
+  remainingScans: number | null;
+  expiresAt: string | null;
+  label: string | null;
+};
+
+type CheckoutBanner = {
+  tone: string;
+  title: string;
+  body: string;
+};
 
 const tabs: Array<{ id: TabId; label: string }> = [
   { id: "analysis", label: "Analysis" },
@@ -25,52 +40,56 @@ const tabs: Array<{ id: TabId; label: string }> = [
 
 const planCards = [
   {
+    id: "basic" as const,
     name: "Basic",
     price: "19€",
     frequency: "per analisi",
     description: "Per revisioni singole prima della firma.",
     points: [
-      "1 scansione",
-      "Risk Score",
-      "Classificazione per severita'",
-      "Suggerimenti di negoziazione",
+      "1 analisi documentale completa",
+      "Risk Score e clausole per severita'",
+      "Obblighi nascosti e leve di negoziazione",
+      "Upload documenti supportato",
     ],
     icon: CircleDollarSign,
     tone: "border-slate-700 bg-slate-900/70",
     buttonClass: "bg-white text-slate-950 hover:bg-slate-200",
+    cta: "Acquista Basic",
   },
   {
+    id: "pro" as const,
     name: "Pro",
     price: "49€",
     frequency: "al mese",
-    description: "Per team che analizzano contratti in modo continuativo.",
+    description: "Per team che analizzano documenti legali in modo continuativo.",
     points: [
-      "Analisi illimitate",
-      "Adatto a consulenti e agenzie",
-      "Maggiore continuita' operativa",
-      "Workflow piu' adatto a volumi ricorrenti",
+      "Analisi continuative per il team",
+      "Pensato per agenzie e consulenti",
+      "Stessa UX operativa senza riacquisti singoli",
+      "Accesso pronto all'uso subito dopo il checkout",
     ],
     icon: WalletCards,
     tone:
       "border-emerald-500/30 bg-[linear-gradient(180deg,rgba(16,185,129,0.14),rgba(15,23,42,0.92))]",
     buttonClass: "bg-emerald-500 text-slate-950 hover:bg-emerald-400",
+    cta: "Attiva Pro",
   },
 ];
 
 const securityCards = [
   {
     title: "256-bit Encryption",
-    body: "Trasmissione protetta tra browser e server durante l'intero flusso di analisi.",
+    body: "Trasmissione protetta tra browser e server durante l'intero flusso di analisi e checkout.",
     icon: LockKeyhole,
   },
   {
     title: "GDPR Ready",
-    body: "Architettura compatibile con una comunicazione privacy-first verso clienti e partner.",
+    body: "Flusso impostato per una comunicazione privacy-first verso clienti, artisti, studi e agenzie.",
     icon: Fingerprint,
   },
   {
     title: "No Data Retention",
-    body: "Il testo caricato non viene conservato dalla piattaforma dopo l'elaborazione.",
+    body: "Il testo caricato non viene presentato in interfaccia come archivio permanente della piattaforma.",
     icon: ShieldCheck,
   },
 ];
@@ -78,23 +97,177 @@ const securityCards = [
 const segmentCards = [
   {
     title: "Privati",
-    body: "Per chi deve firmare un affitto o un contratto di servizi e vuole una lettura del rischio prima della firma.",
+    body: "Per chi deve capire rapidamente il rischio di un documento legale: contratti, diffide, scritture private, atti civili, documenti penali o materiali di compliance.",
     icon: ShieldCheck,
   },
   {
-    title: "Agenzie",
-    body: "Per team immobiliari che vogliono un primo livello di screening prima del passaggio a cliente o legale.",
+    title: "Team e Organizzazioni",
+    body: "Per aziende, agenzie, procurement, HR, compliance e realta' operative che vogliono un primo screening leggibile prima dell'escalation a legale o direzione.",
     icon: Building2,
   },
   {
-    title: "Consulenti",
-    body: "Per professionisti che vogliono offrire una prima revisione sintetica, leggibile e presentabile.",
+    title: "Consulenti e Studi",
+    body: "Per consulenti, studi e professionisti che vogliono una revisione preliminare ordinata, presentabile e coerente con qualsiasi tipologia di documento legale.",
     icon: Users2,
   },
 ];
 
+const emptyAccessState: AccessState = {
+  hasAccess: false,
+  plan: null,
+  remainingScans: null,
+  expiresAt: null,
+  label: null,
+};
+
+function isTabId(value: string | null): value is TabId {
+  return (
+    value === "analysis" ||
+    value === "plans" ||
+    value === "security" ||
+    value === "segments"
+  );
+}
+
+function isPlanId(value: string | null): value is PlanId {
+  return value === "basic" || value === "pro";
+}
+
+function readLocationState() {
+  if (typeof window === "undefined") {
+    return {
+      tab: null as TabId | null,
+      checkoutState: null as "success" | "cancel" | null,
+      checkoutPlan: null as PlanId | null,
+      sessionId: null as string | null,
+    };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  const checkout = params.get("checkout");
+  const plan = params.get("plan");
+  const sessionId = params.get("session_id");
+
+  return {
+    tab: isTabId(tab) ? tab : null,
+    checkoutState:
+      checkout === "success" || checkout === "cancel" ? checkout : null,
+    checkoutPlan: isPlanId(plan) ? plan : null,
+    sessionId,
+  };
+}
+
+function replaceUrlWithTab(tab: TabId) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const nextUrl = new URL(window.location.href);
+  nextUrl.search = "";
+  nextUrl.searchParams.set("tab", tab);
+  window.history.replaceState({}, "", nextUrl.toString());
+}
+
+function buildCheckoutSuccessBanner(plan: PlanId): CheckoutBanner {
+  return plan === "basic"
+    ? {
+        tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
+        title: "Accesso Basic attivato.",
+        body: "Il pagamento e' confermato. Puoi usare subito la tua analisi singola nel pannello Analysis.",
+      }
+    : {
+        tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
+        title: "Accesso Pro attivato.",
+        body: "L'abbonamento e' confermato. Il workspace e' pronto per un uso continuativo.",
+      };
+}
+
 export function LexArmorControlCenter() {
-  const [activeTab, setActiveTab] = useState<TabId>("analysis");
+  const [activeTab, setActiveTab] = useState<TabId>(
+    () => readLocationState().tab ?? "analysis"
+  );
+  const [access, setAccess] = useState<AccessState>(emptyAccessState);
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [checkoutBannerCopy, setCheckoutBannerCopy] =
+    useState<CheckoutBanner | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncState() {
+      const location = readLocationState();
+
+      if (location.checkoutState === "success" && location.sessionId) {
+        const response = await fetch("/api/checkout/confirm", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sessionId: location.sessionId }),
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          access?: AccessState;
+        };
+
+        if (cancelled) {
+          return;
+        }
+
+        if (response.ok && data.access) {
+          setAccess(data.access);
+          setCheckoutBannerCopy(
+            buildCheckoutSuccessBanner(location.checkoutPlan ?? "basic")
+          );
+          setActiveTab("analysis");
+          replaceUrlWithTab("analysis");
+        } else {
+          setCheckoutBannerCopy({
+            tone: "border-red-400/20 bg-red-400/10 text-red-100",
+            title: "Pagamento non confermato.",
+            body:
+              data.error ||
+              "Non sono riuscito a confermare il checkout. Riapri il piano e riprova.",
+          });
+          setActiveTab("plans");
+          replaceUrlWithTab("plans");
+        }
+
+        setAccessLoading(false);
+        return;
+      }
+
+      const response = await fetch("/api/access");
+      const data = (await response.json()) as { access?: AccessState };
+
+      if (cancelled) {
+        return;
+      }
+
+      setAccess(data.access ?? emptyAccessState);
+
+      if (location.checkoutState === "cancel") {
+        setCheckoutBannerCopy({
+          tone: "border-white/10 bg-white/[0.04] text-slate-100",
+          title: "Checkout interrotto.",
+          body:
+            "Nessun addebito effettuato. Puoi riprendere il pagamento in qualsiasi momento dal pannello Plans.",
+        });
+        setActiveTab("plans");
+        replaceUrlWithTab("plans");
+      }
+
+      setAccessLoading(false);
+    }
+
+    void syncState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.06),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.05),transparent_22%),#020817] text-white">
@@ -155,9 +328,34 @@ export function LexArmorControlCenter() {
           </div>
         </header>
 
+        {checkoutBannerCopy ? (
+          <section
+            className={`mt-5 rounded-[1.6rem] border px-5 py-4 ${checkoutBannerCopy.tone}`}
+          >
+            <p className="text-sm font-semibold">{checkoutBannerCopy.title}</p>
+            <p className="mt-1 text-sm leading-7 opacity-90">
+              {checkoutBannerCopy.body}
+            </p>
+          </section>
+        ) : null}
+
         <section className="mt-5 rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.94),rgba(2,8,23,0.96))] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.22)] lg:p-7">
-          {activeTab === "analysis" ? <ContractStudio /> : null}
-          {activeTab === "plans" ? <PlansBoard /> : null}
+          {activeTab === "analysis" ? (
+            <ContractStudio
+              access={access}
+              accessLoading={accessLoading}
+              onOpenPlans={() => setActiveTab("plans")}
+              onAccessChange={setAccess}
+            />
+          ) : null}
+          {activeTab === "plans" ? (
+            <PlansBoard
+              access={access}
+              accessLoading={accessLoading}
+              onAccessChange={setAccess}
+              onCheckoutBannerChange={setCheckoutBannerCopy}
+            />
+          ) : null}
           {activeTab === "security" ? <SecurityBoard /> : null}
           {activeTab === "segments" ? <SegmentsBoard /> : null}
         </section>
@@ -166,17 +364,107 @@ export function LexArmorControlCenter() {
   );
 }
 
-function PlansBoard() {
+function PlansBoard({
+  access,
+  accessLoading,
+  onAccessChange,
+  onCheckoutBannerChange,
+}: {
+  access: AccessState;
+  accessLoading: boolean;
+  onAccessChange: (access: AccessState) => void;
+  onCheckoutBannerChange: (banner: CheckoutBanner | null) => void;
+}) {
+  const [pendingPlan, setPendingPlan] = useState<PlanId | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
+
+  async function startCheckout(planId: PlanId) {
+    setPendingPlan(planId);
+    setCheckoutError("");
+    onCheckoutBannerChange(null);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ plan: planId }),
+      });
+
+      const data = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !data.url) {
+        throw new Error(
+          data.error || "Non sono riuscito ad aprire il checkout Stripe."
+        );
+      }
+
+      window.location.assign(data.url);
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "Checkout non disponibile. Riprova tra poco."
+      );
+      setPendingPlan(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
-      <div className="max-w-3xl">
-        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Commercial plans
-        </p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          Due piani, descritti in modo semplice.
-        </h2>
+      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+            Commercial plans
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
+            Accessi pronti per Stripe Checkout.
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            Il piano Basic sblocca 1 analisi. Il piano Pro attiva l&apos;accesso
+            continuo per il workspace.
+          </p>
+        </div>
+
+        <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
+          <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+            Access status
+          </p>
+          <div className="mt-3 text-lg font-semibold text-white">
+            {accessLoading
+              ? "Verifica accesso in corso..."
+              : access.hasAccess
+                ? access.plan === "basic"
+                  ? `Basic attivo · ${access.remainingScans ?? 0} analisi disponibili`
+                  : "Pro attivo"
+                : "Nessun accesso attivo"}
+          </div>
+          <p className="mt-2 text-sm leading-7 text-slate-300">
+            {access.hasAccess
+              ? "Puoi tornare subito nel pannello Analysis e usare il workspace."
+              : "Completa il checkout e l'accesso viene attivato automaticamente su questo browser."}
+          </p>
+          {!accessLoading && access.hasAccess ? (
+            <button
+              type="button"
+              onClick={() => onAccessChange(access)}
+              className="mt-4 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100"
+            >
+              Accesso rilevato
+            </button>
+          ) : null}
+        </div>
       </div>
+
+      {checkoutError ? (
+        <div className="rounded-[1.4rem] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+          {checkoutError}
+        </div>
+      ) : null}
 
       <div className="grid gap-5 xl:grid-cols-2">
         {planCards.map((plan) => {
@@ -221,9 +509,11 @@ function PlansBoard() {
 
               <button
                 type="button"
-                className={`mt-auto inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold transition ${plan.buttonClass}`}
+                onClick={() => startCheckout(plan.id)}
+                disabled={pendingPlan !== null}
+                className={`mt-auto inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${plan.buttonClass}`}
               >
-                Select plan
+                {pendingPlan === plan.id ? "Reindirizzamento a Stripe..." : plan.cta}
                 <ArrowUpRight size={15} />
               </button>
             </article>
@@ -279,9 +569,9 @@ function SecurityBoard() {
           </h3>
           <div className="mt-6 grid gap-3">
             {[
-              "Privacy comunicata vicino al punto di upload",
-              "Badge di protezione integrati nell'interfaccia",
-              "Lessico sobrio e coerente con un posizionamento premium",
+              "Privacy comunicata accanto al punto di upload",
+              "Stato accesso e checkout integrati nel workspace",
+              "Badge di sicurezza visibili senza linguaggio promozionale",
             ].map((item) => (
               <div
                 key={item}
@@ -305,7 +595,7 @@ function SegmentsBoard() {
           Use cases
         </p>
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-          Tre segmenti, tre contesti chiari.
+          Screening legale trasversale, in contesti diversi.
         </h2>
       </div>
 
@@ -338,13 +628,13 @@ function SegmentsBoard() {
             Segment focus
           </p>
           <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-            Ogni profilo vede subito il proprio caso d’uso.
+            Lo stesso motore si adatta a casistiche molto diverse.
           </h3>
           <div className="mt-6 grid gap-3">
             {[
-              "Privati: riduzione del rischio prima della firma",
-              "Agenzie: accelerazione del primo screening",
-              "Consulenti: revisione preliminare piu' presentabile",
+              "Privati: lettura rapida del rischio prima di firmare o rispondere",
+              "Team: primo screening su documenti civili, penali, commerciali e compliance",
+              "Studi: revisione preliminare piu' ordinata e presentabile",
             ].map((item) => (
               <div
                 key={item}
