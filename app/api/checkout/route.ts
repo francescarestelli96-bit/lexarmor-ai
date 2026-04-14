@@ -1,13 +1,6 @@
-import Stripe from "stripe";
-import { readConfiguredEnv } from "@/lib/env";
+import { stripe } from "@/lib/stripe";
 
 type PlanId = "basic" | "pro";
-
-const stripeSecretKey = readConfiguredEnv("STRIPE_SECRET_KEY");
-
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey)
-  : null;
 
 const planConfig: Record<
   PlanId,
@@ -65,22 +58,14 @@ export async function POST(request: Request) {
     }
 
     const origin = new URL(request.url).origin;
-    const successUrl = new URL("/", origin);
-    successUrl.searchParams.set("tab", "analysis");
-    successUrl.searchParams.set("checkout", "success");
-    successUrl.searchParams.set("plan", plan);
-    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
-
-    const cancelUrl = new URL("/", origin);
-    cancelUrl.searchParams.set("tab", "plans");
-    cancelUrl.searchParams.set("checkout", "cancel");
-    cancelUrl.searchParams.set("plan", plan);
+    const successUrl = `${origin}/?tab=analysis&checkout=success&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/?tab=plans&checkout=cancel&plan=${plan}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: config.mode,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: successUrl.toString(),
-      cancel_url: cancelUrl.toString(),
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       billing_address_collection: "auto",
       allow_promotion_codes: true,
       locale: "it",
