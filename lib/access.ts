@@ -10,6 +10,8 @@ export type StoredAccessState = {
   expiresAt: string;
   checkoutSessionId: string;
   subscriptionId?: string;
+  subscriptionStatus?: string;
+  customerId?: string;
   issuedAt: string;
   source?: AccessSource;
 };
@@ -92,6 +94,9 @@ export function readAccessToken(token: string | undefined | null) {
       typeof parsed.expiresAt !== "string" ||
       typeof parsed.checkoutSessionId !== "string" ||
       typeof parsed.issuedAt !== "string" ||
+      (parsed.subscriptionStatus !== undefined &&
+        typeof parsed.subscriptionStatus !== "string") ||
+      (parsed.customerId !== undefined && typeof parsed.customerId !== "string") ||
       (parsed.source !== undefined && !isAccessSource(parsed.source)) ||
       (parsed.remainingScans !== null &&
         (typeof parsed.remainingScans !== "number" || parsed.remainingScans < 0))

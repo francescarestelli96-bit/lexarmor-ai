@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { readConfiguredEnv } from "@/lib/env";
 import {
   ACCESS_COOKIE_NAME,
@@ -9,12 +8,7 @@ import {
   toClientAccessState,
   type StoredAccessState,
 } from "@/lib/access";
-
-const stripeSecretKey = readConfiguredEnv("STRIPE_SECRET_KEY");
-
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey)
-  : null;
+import { stripe } from "@/lib/stripe";
 
 function isPlanId(value: unknown): value is PlanId {
   return value === "basic" || value === "pro";
@@ -99,6 +93,11 @@ export async function POST(request: Request) {
         expiresAt: new Date(currentPeriodEnd * 1000).toISOString(),
         checkoutSessionId: session.id,
         subscriptionId: subscription.id,
+        subscriptionStatus: subscription.status,
+        customerId:
+          typeof subscription.customer === "string"
+            ? subscription.customer
+            : subscription.customer?.id,
         issuedAt: new Date().toISOString(),
         source: "checkout",
       };
