@@ -139,7 +139,17 @@ async function ocrPdf(buffer: Buffer) {
 }
 
 async function extractPdfWithFallback(buffer: Buffer) {
-  const directText = await extractPdf(buffer);
+  let directText = "";
+  let directError: Error | null = null;
+
+  try {
+    directText = await extractPdf(buffer);
+  } catch (error) {
+    directError =
+      error instanceof Error
+        ? error
+        : new Error("PDF text extraction failed before OCR fallback.");
+  }
 
   if (directText.length >= MIN_DIRECT_PDF_TEXT_LENGTH) {
     return {
@@ -148,13 +158,32 @@ async function extractPdfWithFallback(buffer: Buffer) {
     };
   }
 
-  const ocrText = await ocrPdf(buffer);
+  try {
+    const ocrText = await ocrPdf(buffer);
 
-  if (ocrText) {
-    return {
-      text: ocrText,
-      detectedType: "pdf-ocr",
-    };
+    if (ocrText) {
+      return {
+        text: ocrText,
+        detectedType: "pdf-ocr",
+      };
+    }
+  } catch (ocrError) {
+    if (directText) {
+      return {
+        text: directText,
+        detectedType: "pdf",
+      };
+    }
+
+    if (directError) {
+      throw directError;
+    }
+
+    throw ocrError;
+  }
+
+  if (directError) {
+    throw directError;
   }
 
   return {
