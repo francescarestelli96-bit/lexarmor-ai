@@ -12,6 +12,8 @@ const RTF_EXTENSIONS = new Set(["rtf"]);
 const WORD_EXTENSIONS = new Set(["doc", "docx"]);
 const PDF_EXTENSIONS = new Set(["pdf"]);
 const PAGES_EXTENSIONS = new Set(["pages"]);
+const MIN_DIRECT_PDF_TEXT_LENGTH = 80;
+const MAX_PDF_OCR_PAGES = 6;
 
 function getExtension(filename: string) {
   const clean = filename.toLowerCase().trim();
@@ -58,6 +60,107 @@ async function extractPdf(buffer: Buffer) {
   } finally {
     await parser.destroy();
   }
+}
+
+async function ensurePdfOcrPolyfills() {
+  const canvasModule = await import("@napi-rs/canvas");
+
+  if (typeof globalThis.DOMMatrix === "undefined") {
+    globalThis.DOMMatrix = canvasModule.DOMMatrix as unknown as typeof DOMMatrix;
+  }
+
+  if (typeof globalThis.ImageData === "undefined") {
+    globalThis.ImageData = canvasModule.ImageData as unknown as typeof ImageData;
+  }
+
+  if (typeof globalThis.Path2D === "undefined") {
+    globalThis.Path2D = canvasModule.Path2D as unknown as typeof Path2D;
+  }
+
+  return canvasModule;
+}
+
+async function ocrPdf(buffer: Buffer) {
+  const [{ createCanvas }, pdfjsModule, tesseractModule] = await Promise.all([
+    ensurePdfOcrPolyfills(),
+    import("pdfjs-dist/legacy/build/pdf.mjs"),
+    import("tesseract.js"),
+  ]);
+
+  const pdfjs = pdfjsModule as typeof import("pdfjs-dist/legacy/build/pdf.mjs");
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buffer),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    disableFontFace: true,
+  });
+  const pdfDocument = await loadingTask.promise;
+  const pageCount = Math.min(pdfDocument.numPages, MAX_PDF_OCR_PAGES);
+  const worker = await tesseractModule.createWorker("ita+eng", 1, {
+    logger: () => undefined,
+  });
+
+  try {
+    const pages: string[] = [];
+
+    for (let pageIndex = 1; pageIndex <= pageCount; pageIndex += 1) {
+      const page = await pdfDocument.getPage(pageIndex);
+      const viewport = page.getViewport({ scale: 1.8 });
+      const canvas = createCanvas(
+        Math.max(1, Math.ceil(viewport.width)),
+        Math.max(1, Math.ceil(viewport.height))
+      );
+      const context = canvas.getContext("2d");
+
+      const renderContext = {
+        canvas: canvas as unknown,
+        canvasContext: context as unknown,
+        viewport,
+      } as Parameters<typeof page.render>[0];
+
+      await page.render(renderContext).promise;
+
+      const imageBuffer = canvas.toBuffer("image/png");
+      const result = await worker.recognize(imageBuffer);
+      const normalizedPageText = normalizeExtractedText(result.data.text);
+
+      if (normalizedPageText) {
+        pages.push(normalizedPageText);
+      }
+
+      page.cleanup();
+    }
+
+    return normalizeExtractedText(pages.join("\n\n"));
+  } finally {
+    await worker.terminate();
+    await loadingTask.destroy();
+  }
+}
+
+async function extractPdfWithFallback(buffer: Buffer) {
+  const directText = await extractPdf(buffer);
+
+  if (directText.length >= MIN_DIRECT_PDF_TEXT_LENGTH) {
+    return {
+      text: directText,
+      detectedType: "pdf",
+    };
+  }
+
+  const ocrText = await ocrPdf(buffer);
+
+  if (ocrText) {
+    return {
+      text: ocrText,
+      detectedType: "pdf-ocr",
+    };
+  }
+
+  return {
+    text: directText,
+    detectedType: "pdf",
+  };
 }
 
 async function extractDocx(buffer: Buffer) {
@@ -124,10 +227,7 @@ export async function extractTextFromFile(file: File): Promise<ExtractedDocument
   }
 
   if (PDF_EXTENSIONS.has(extension)) {
-    return {
-      text: await extractPdf(buffer),
-      detectedType: "pdf",
-    };
+    return extractPdfWithFallback(buffer);
   }
 
   if (extension === "docx") {

@@ -305,6 +305,7 @@ export function ContractStudio({
         error?: string;
         text?: string;
         filename?: string;
+        detectedType?: string;
       };
 
       if (!response.ok || !data.text) {
@@ -316,7 +317,9 @@ export function ContractStudio({
 
       setText(data.text);
       setUploadNotice(
-        `${data.filename ?? file.name} caricato correttamente. Il testo e' pronto per l'analisi.`
+        data.detectedType === "pdf-ocr"
+          ? `${data.filename ?? file.name} caricato correttamente. Ho rilevato un PDF scannerizzato e ho estratto il testo con OCR.`
+          : `${data.filename ?? file.name} caricato correttamente. Il testo e' pronto per l'analisi.`
       );
     } catch (upload) {
       setUploadError(
@@ -585,9 +588,9 @@ export function ContractStudio({
   const riskScoreClass = smartRiskState?.scoreClass ?? "text-white";
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+    <div className="grid gap-4 sm:gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] xl:gap-6">
       <section
-        className={`rounded-[1.8rem] border bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-6 transition lg:p-7 ${
+        className={`rounded-[1.45rem] border bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-4 transition sm:rounded-[1.8rem] sm:p-5 lg:p-7 ${
           isDragging
             ? "border-emerald-400/50 shadow-[0_0_0_1px_rgba(52,211,153,0.18)]"
             : "border-white/10"
@@ -602,7 +605,7 @@ export function ContractStudio({
               <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
                 Document intake
               </p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white lg:text-3xl">
+              <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl lg:text-3xl">
                 Carica o incolla il documento legale da analizzare.
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-300">
@@ -627,7 +630,7 @@ export function ContractStudio({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className={`mt-2 flex min-h-[138px] w-full flex-col items-center justify-center rounded-[1.6rem] border border-dashed px-5 text-center transition ${
+            className={`mt-2 flex min-h-[112px] w-full flex-col items-center justify-center rounded-[1.4rem] border border-dashed px-4 text-center transition sm:min-h-[138px] sm:rounded-[1.6rem] sm:px-5 ${
               isDragging
                 ? "border-emerald-400/60 bg-emerald-400/10"
                 : "border-white/12 bg-[#07101d]"
@@ -645,7 +648,7 @@ export function ContractStudio({
               </>
             ) : (
               <>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/8 text-emerald-300">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/8 text-emerald-300 sm:h-12 sm:w-12">
                   <FileUp size={22} />
                 </div>
                 <span className="mt-4 text-sm font-medium text-white">
@@ -690,7 +693,7 @@ export function ContractStudio({
         ) : null}
 
         <div
-          className={`mt-6 rounded-[1.5rem] border transition ${
+          className={`mt-5 rounded-[1.35rem] border transition sm:mt-6 sm:rounded-[1.5rem] ${
             isDragging
               ? "border-emerald-400/60 bg-emerald-400/5"
               : "border-white/10 bg-[#050b14]"
@@ -724,19 +727,19 @@ export function ContractStudio({
               }
             }}
             placeholder="Incolla il testo del documento oppure trascina qui un PDF, Word o Pages..."
-            className="h-[320px] w-full resize-none bg-transparent px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 xl:h-[420px]"
+            className="h-[196px] w-full resize-none bg-transparent px-4 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 sm:h-[280px] sm:px-5 xl:h-[420px]"
           />
         </div>
 
-        <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-col gap-4 xl:mt-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             {complianceBadges.map((badge) => {
               const Icon = badge.icon;
 
               return (
                 <div
                   key={badge.label}
-                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-slate-200"
+                  className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-slate-200"
                 >
                   <Icon size={14} className="text-emerald-300" />
                   <span>{badge.label}</span>
@@ -750,7 +753,7 @@ export function ContractStudio({
               type="button"
               disabled={isPending || text.trim().length < 80}
               onClick={analyzeContract}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-[#04101c] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-[#04101c] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300 sm:w-auto"
             >
               {isPending ? (
                 <>
@@ -768,7 +771,7 @@ export function ContractStudio({
             <button
               type="button"
               onClick={onOpenPlans}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200 sm:w-auto"
             >
               Sblocca analisi
               <Upload size={16} />
@@ -792,13 +795,13 @@ export function ContractStudio({
         ) : null}
       </section>
 
-      <section className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] p-6 lg:p-7">
+      <section className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,29,0.95),rgba(11,23,40,0.96))] p-4 sm:rounded-[1.8rem] sm:p-5 lg:p-7">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
               Risk dashboard
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white lg:text-3xl">
+            <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl lg:text-3xl">
               {analysis ? "Analisi completata" : "In attesa di un documento"}
             </h2>
           </div>
@@ -812,7 +815,7 @@ export function ContractStudio({
         </div>
 
         {isPending ? (
-          <div className="mt-6 rounded-[1.6rem] border border-slate-700 bg-slate-950/40 p-6">
+          <div className="mt-5 rounded-[1.45rem] border border-slate-700 bg-slate-950/40 p-4 sm:mt-6 sm:rounded-[1.6rem] sm:p-6">
             <div className="flex items-center gap-3 text-emerald-300">
               <LoaderCircle size={18} className="animate-spin" />
               <span className="text-sm uppercase tracking-[0.22em]">
@@ -836,15 +839,15 @@ export function ContractStudio({
           </div>
         ) : analysis ? (
           <div className="mt-6 space-y-4">
-            <div className="rounded-[1.6rem] border border-white/8 bg-white/5 p-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-200">
+            <div className="rounded-[1.45rem] border border-white/8 bg-white/5 p-4 sm:rounded-[1.6rem] sm:p-5">
+              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-200">
                   {analysis.contractType}
                 </div>
                 {analysis.parties.map((party) => (
                   <div
                     key={party}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300"
+                    className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300"
                   >
                     {party}
                   </div>
@@ -858,10 +861,10 @@ export function ContractStudio({
                       Risk score
                     </p>
                     <div
-                      className={`mt-2 text-6xl font-semibold tracking-[-0.06em] ${riskScoreClass}`}
+                      className={`mt-2 text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${riskScoreClass}`}
                     >
                       {analysis.riskScore}
-                      <span className="ml-1 text-3xl text-slate-500">/100</span>
+                      <span className="ml-1 text-2xl text-slate-500 sm:text-3xl">/100</span>
                     </div>
                   </div>
                   <p className="max-w-xl text-sm leading-7 text-slate-300">
@@ -869,12 +872,12 @@ export function ContractStudio({
                   </p>
                 </div>
 
-                <div className="rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-5 shadow-[0_20px_70px_rgba(2,6,23,0.4)]">
+                <div className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-4 shadow-[0_20px_70px_rgba(2,6,23,0.4)] sm:rounded-[1.7rem] sm:p-5">
                   <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                     Signal map
                   </p>
-                  <div className="mt-4 flex gap-5">
-                    <div className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-5 py-6">
+                  <div className="mt-4 flex flex-col gap-4 sm:gap-5 md:flex-row">
+                    <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
                       <div className="flex flex-col items-center gap-4">
                         {panels.map((panel) => {
                           const isActive = smartRiskState?.level === panel.key;
@@ -882,7 +885,7 @@ export function ContractStudio({
                           return (
                             <div
                               key={`signal-dot-${panel.key}`}
-                              className={`h-20 w-20 rounded-full border transition ${
+                              className={`h-16 w-16 rounded-full border transition sm:h-20 sm:w-20 ${
                                 isActive
                                   ? `${panel.dotClass} scale-100`
                                   : "border-white/10 bg-slate-900/90 opacity-35"
@@ -1024,7 +1027,7 @@ export function ContractStudio({
             </div>
 
             <div className="grid gap-4 xl:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-5">
+              <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.04] p-4 sm:rounded-[1.5rem] sm:p-5">
                 <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
                   Hidden obligations
                 </p>
@@ -1040,7 +1043,7 @@ export function ContractStudio({
                 </ul>
               </div>
 
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-5">
+              <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.04] p-4 sm:rounded-[1.5rem] sm:p-5">
                 <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
                   Negotiation moves
                 </p>
@@ -1062,7 +1065,7 @@ export function ContractStudio({
             </div>
           </div>
         ) : (
-          <div className="mt-6 rounded-[1.6rem] border border-white/8 bg-white/[0.04] p-6">
+          <div className="mt-5 rounded-[1.45rem] border border-white/8 bg-white/[0.04] p-4 sm:mt-6 sm:rounded-[1.6rem] sm:p-6">
             <h3 className="text-xl font-semibold text-white">
               Nessuna analisi disponibile
             </h3>

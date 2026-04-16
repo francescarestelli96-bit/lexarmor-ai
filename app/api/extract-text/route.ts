@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Non sono riuscito a estrarre abbastanza testo dal documento. Prova a esportarlo in PDF o DOCX.",
+            "Non sono riuscito a estrarre abbastanza testo dal documento. Se e' un PDF scannerizzato, assicurati che sia leggibile; in alternativa esporta in PDF testuale o DOCX.",
         },
         { status: 422 }
       );

@@ -120,6 +120,13 @@ const segmentCards = [
   },
 ];
 
+const legalDisclaimerPoints = [
+  "LexArmor fornisce uno screening documentale automatizzato a scopo informativo e organizzativo.",
+  "Il servizio non costituisce consulenza legale, parere professionale, attivita' difensiva o sostituzione del giudizio di un avvocato abilitato.",
+  "Prima di firmare, depositare, impugnare, opporsi o assumere decisioni con effetti giuridici o economici, il contenuto deve essere verificato da un professionista qualificato.",
+  "L'utente resta responsabile delle decisioni assunte sulla base del documento e dell'eventuale verifica professionale successiva.",
+];
+
 const emptyAccessState: AccessState = {
   hasAccess: false,
   plan: null,
@@ -342,24 +349,24 @@ export function LexArmorControlCenter({
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.06),transparent_18%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.05),transparent_22%),#020817] text-white">
-      <div className="mx-auto max-w-[1440px] px-4 py-5 lg:px-6 lg:py-6">
-        <header className="rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] px-5 py-5 shadow-[0_20px_80px_rgba(0,0,0,0.28)] lg:px-7">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mx-auto max-w-[1440px] px-3 py-3 sm:px-4 sm:py-5 lg:px-6 lg:py-6">
+        <header className="rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,8,23,0.96))] px-4 py-4 shadow-[0_20px_80px_rgba(0,0,0,0.28)] sm:rounded-[1.9rem] sm:px-5 sm:py-5 lg:px-7">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-950">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-950 sm:h-12 sm:w-12">
                 LA
               </span>
               <div>
-                <div className="text-lg font-semibold tracking-[0.08em] text-white">
+                <div className="text-base font-semibold tracking-[0.08em] text-white sm:text-lg">
                   LexArmor
                 </div>
-                <div className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                <div className="text-[11px] uppercase tracking-[0.22em] text-slate-400 sm:text-xs sm:tracking-[0.24em]">
                   {demoMode ? "Social demo workspace" : "Contract risk analysis"}
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               {demoMode ? (
                 <span className="rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
                   Demo Reel Mode
@@ -374,7 +381,7 @@ export function LexArmorControlCenter({
               <button
                 type="button"
                 onClick={() => setActiveTab("analysis")}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200 sm:w-auto"
               >
                 Open analysis
                 <ArrowUpRight size={15} />
@@ -382,7 +389,7 @@ export function LexArmorControlCenter({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 sm:mt-5 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             {tabs.map((tab) => {
               const selected = tab.id === activeTab;
 
@@ -391,7 +398,7 @@ export function LexArmorControlCenter({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
                     selected
                       ? "bg-white text-slate-950"
                       : "border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06]"
@@ -406,7 +413,7 @@ export function LexArmorControlCenter({
 
         {checkoutBannerCopy ? (
           <section
-            className={`mt-5 rounded-[1.6rem] border px-5 py-4 ${checkoutBannerCopy.tone}`}
+            className={`mt-4 rounded-[1.4rem] border px-4 py-3 sm:mt-5 sm:rounded-[1.6rem] sm:px-5 sm:py-4 ${checkoutBannerCopy.tone}`}
           >
             <p className="text-sm font-semibold">{checkoutBannerCopy.title}</p>
             <p className="mt-1 text-sm leading-7 opacity-90">
@@ -415,7 +422,7 @@ export function LexArmorControlCenter({
           </section>
         ) : null}
 
-        <section className="mt-5 rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.94),rgba(2,8,23,0.96))] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.22)] lg:p-7">
+        <section className="mt-4 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.94),rgba(2,8,23,0.96))] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.22)] sm:mt-5 sm:rounded-[1.9rem] sm:p-5 lg:p-7">
           {activeTab === "analysis" ? (
             <ContractStudio
               access={access}
@@ -439,6 +446,44 @@ export function LexArmorControlCenter({
           {activeTab === "security" ? <SecurityBoard /> : null}
           {activeTab === "segments" ? <SegmentsBoard /> : null}
         </section>
+
+        <footer className="mt-4 grid gap-3 sm:mt-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <section className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(2,8,23,0.92))] px-4 py-4 sm:px-5">
+            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+              Disclaimer legale
+            </p>
+            <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">
+              Supporto informativo, non sostituzione del legale.
+            </h2>
+            <div className="mt-4 grid gap-3">
+              {legalDisclaimerPoints.map((point) => (
+                <div
+                  key={point}
+                  className="rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-slate-200"
+                >
+                  {point}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-[1.4rem] border border-white/10 bg-slate-950/70 px-4 py-4 sm:px-5">
+            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+              Uso corretto
+            </p>
+            <div className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+              <p>
+                Usa LexArmor per un primo orientamento su rischio, obblighi,
+                ambiguita e punti da verificare.
+              </p>
+              <p>
+                Per firme, contenzioso, opposizioni, ricorsi, depositi o
+                decisioni con impatto economico, fiscale, civile o penale serve
+                sempre una verifica professionale indipendente.
+              </p>
+            </div>
+          </section>
+        </footer>
       </div>
     </main>
   );
