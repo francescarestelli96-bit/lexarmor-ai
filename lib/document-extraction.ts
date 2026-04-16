@@ -15,6 +15,20 @@ const PAGES_EXTENSIONS = new Set(["pages"]);
 const MIN_DIRECT_PDF_TEXT_LENGTH = 80;
 const MAX_PDF_OCR_PAGES = 6;
 
+async function ensurePdfJsWorker() {
+  const globalWithPdfWorker = globalThis as typeof globalThis & {
+    pdfjsWorker?: unknown;
+  };
+
+  if (!globalWithPdfWorker.pdfjsWorker) {
+    const workerModule = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
+
+    Object.assign(globalWithPdfWorker, {
+      pdfjsWorker: workerModule,
+    });
+  }
+}
+
 function getExtension(filename: string) {
   const clean = filename.toLowerCase().trim();
   const pieces = clean.split(".");
@@ -44,6 +58,8 @@ function stripRtf(text: string) {
 }
 
 async function extractPdf(buffer: Buffer) {
+  await ensurePdfJsWorker();
+
   const pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const pdfjs = pdfjsModule as typeof import("pdfjs-dist/legacy/build/pdf.mjs");
   const loadingTask = pdfjs.getDocument({
@@ -98,8 +114,9 @@ async function ensurePdfOcrPolyfills() {
 }
 
 async function ocrPdf(buffer: Buffer) {
-  const [{ createCanvas }, pdfjsModule, tesseractModule] = await Promise.all([
+  const [{ createCanvas }, , pdfjsModule, tesseractModule] = await Promise.all([
     ensurePdfOcrPolyfills(),
+    ensurePdfJsWorker(),
     import("pdfjs-dist/legacy/build/pdf.mjs"),
     import("tesseract.js"),
   ]);
