@@ -120,12 +120,8 @@ const segmentCards = [
   },
 ];
 
-const legalDisclaimerPoints = [
-  "LexArmor fornisce uno screening documentale automatizzato a scopo informativo e organizzativo.",
-  "Il servizio non costituisce consulenza legale, parere professionale, attivita' difensiva o sostituzione del giudizio di un avvocato abilitato.",
-  "Prima di firmare, depositare, impugnare, opporsi o assumere decisioni con effetti giuridici o economici, il contenuto deve essere verificato da un professionista qualificato.",
-  "L'utente resta responsabile delle decisioni assunte sulla base del documento e dell'eventuale verifica professionale successiva.",
-];
+const legalDisclaimer =
+  "LexArmor fornisce uno screening automatizzato a solo scopo informativo. Non costituisce consulenza legale, non sostituisce un avvocato e non assume responsabilita', nei limiti di legge, per decisioni, danni o conseguenze derivanti dall'uso del servizio o dei contenuti generati.";
 
 const emptyAccessState: AccessState = {
   hasAccess: false,
@@ -447,42 +443,10 @@ export function LexArmorControlCenter({
           {activeTab === "segments" ? <SegmentsBoard /> : null}
         </section>
 
-        <footer className="mt-4 grid gap-3 sm:mt-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <section className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(2,8,23,0.92))] px-4 py-4 sm:px-5">
-            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Disclaimer legale
-            </p>
-            <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">
-              Supporto informativo, non sostituzione del legale.
-            </h2>
-            <div className="mt-4 grid gap-3">
-              {legalDisclaimerPoints.map((point) => (
-                <div
-                  key={point}
-                  className="rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-slate-200"
-                >
-                  {point}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-[1.4rem] border border-white/10 bg-slate-950/70 px-4 py-4 sm:px-5">
-            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Uso corretto
-            </p>
-            <div className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-              <p>
-                Usa LexArmor per un primo orientamento su rischio, obblighi,
-                ambiguita e punti da verificare.
-              </p>
-              <p>
-                Per firme, contenzioso, opposizioni, ricorsi, depositi o
-                decisioni con impatto economico, fiscale, civile o penale serve
-                sempre una verifica professionale indipendente.
-              </p>
-            </div>
-          </section>
+        <footer className="mt-4 border-t border-white/8 pt-3 sm:mt-5 sm:pt-4">
+          <p className="text-[10px] leading-5 text-slate-500 sm:text-[11px]">
+            {legalDisclaimer}
+          </p>
         </footer>
       </div>
     </main>
