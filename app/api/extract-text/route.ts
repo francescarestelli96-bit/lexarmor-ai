@@ -5,14 +5,21 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get("file");
+    const candidate = formData.get("file");
 
-    if (!(file instanceof File)) {
+    if (
+      !candidate ||
+      typeof candidate !== "object" ||
+      !("arrayBuffer" in candidate) ||
+      typeof candidate.arrayBuffer !== "function"
+    ) {
       return Response.json(
         { error: "Seleziona un file valido." },
         { status: 400 }
       );
     }
+
+    const file = candidate as File;
 
     if (file.size === 0) {
       return Response.json(

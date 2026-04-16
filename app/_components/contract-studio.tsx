@@ -185,6 +185,18 @@ const complianceBadges = [
 ];
 
 const acceptedFormatsLabel = "PDF, DOC, DOCX, PAGES, TXT, RTF, MD, CSV";
+const supportedUploadExtensions = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "pages",
+  "txt",
+  "text",
+  "rtf",
+  "md",
+  "markdown",
+  "csv",
+]);
 
 const emptyAccessState: AccessState = {
   hasAccess: false,
@@ -213,6 +225,12 @@ function formatAccessLabel(access: AccessState) {
   }
 
   return "Pro attivo";
+}
+
+function getFileExtension(name: string) {
+  const clean = name.toLowerCase().trim();
+  const pieces = clean.split(".");
+  return pieces.length > 1 ? pieces.pop() ?? "" : "";
 }
 
 export function ContractStudio({
@@ -246,7 +264,29 @@ export function ContractStudio({
     return () => window.clearInterval(interval);
   }, [isPending]);
 
+  function validateUploadFile(file: File) {
+    const extension = getFileExtension(file.name);
+
+    if (!supportedUploadExtensions.has(extension)) {
+      setUploadNotice("");
+      setUploadError(
+        "Formato non supportato. Carica un file PDF, DOC, DOCX, Pages o di testo."
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   async function extractDocument(file: File) {
+    if (!validateUploadFile(file)) {
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+
+      return;
+    }
+
     setIsExtracting(true);
     setUploadError("");
     setUploadNotice("");
@@ -300,6 +340,37 @@ export function ContractStudio({
     if (file) {
       await extractDocument(file);
     }
+  }
+
+  async function handleIncomingFile(file: File | undefined) {
+    if (!file) {
+      return;
+    }
+
+    await extractDocument(file);
+  }
+
+  async function handleDrop(event: React.DragEvent<HTMLElement>) {
+    event.preventDefault();
+    setIsDragging(false);
+    await handleIncomingFile(event.dataTransfer.files?.[0]);
+  }
+
+  function handleDragOver(event: React.DragEvent<HTMLElement>) {
+    if (!Array.from(event.dataTransfer.types).includes("Files")) {
+      return;
+    }
+
+    event.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(event: React.DragEvent<HTMLElement>) {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+
+    setIsDragging(false);
   }
 
   async function analyzeContract() {
@@ -515,7 +586,16 @@ export function ContractStudio({
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <section className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-6 lg:p-7">
+      <section
+        className={`rounded-[1.8rem] border bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-6 transition lg:p-7 ${
+          isDragging
+            ? "border-emerald-400/50 shadow-[0_0_0_1px_rgba(52,211,153,0.18)]"
+            : "border-white/10"
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-xl">
@@ -547,21 +627,6 @@ export function ContractStudio({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={async (event) => {
-              event.preventDefault();
-              setIsDragging(false);
-
-              const file = event.dataTransfer.files?.[0];
-
-              if (file) {
-                await extractDocument(file);
-              }
-            }}
             className={`mt-2 flex min-h-[138px] w-full flex-col items-center justify-center rounded-[1.6rem] border border-dashed px-5 text-center transition ${
               isDragging
                 ? "border-emerald-400/60 bg-emerald-400/10"
@@ -624,12 +689,44 @@ export function ContractStudio({
           </button>
         ) : null}
 
-        <textarea
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          placeholder="Incolla il testo del documento oppure carica un file..."
-          className="mt-6 h-[320px] w-full resize-none rounded-[1.5rem] border border-white/10 bg-[#050b14] px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 xl:h-[420px]"
-        />
+        <div
+          className={`mt-6 rounded-[1.5rem] border transition ${
+            isDragging
+              ? "border-emerald-400/60 bg-emerald-400/5"
+              : "border-white/10 bg-[#050b14]"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-white/8 px-5 py-3">
+            <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Workspace text
+            </span>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-white/[0.08]"
+            >
+              Carica file
+            </button>
+          </div>
+
+          <textarea
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onPaste={async (event) => {
+              const file = event.clipboardData.files?.[0];
+
+              if (file) {
+                event.preventDefault();
+                await handleIncomingFile(file);
+              }
+            }}
+            placeholder="Incolla il testo del documento oppure trascina qui un PDF, Word o Pages..."
+            className="h-[320px] w-full resize-none bg-transparent px-5 py-4 text-sm leading-7 text-slate-100 outline-none transition placeholder:text-slate-500 xl:h-[420px]"
+          />
+        </div>
 
         <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-wrap gap-2">
