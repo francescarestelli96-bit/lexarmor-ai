@@ -44,21 +44,38 @@ function stripRtf(text: string) {
 }
 
 async function extractPdf(buffer: Buffer) {
-  if (typeof globalThis.DOMMatrix === "undefined") {
-    const DOMMatrixModule = await import("@thednp/dommatrix");
-    const DOMMatrixPolyfill = DOMMatrixModule.default as unknown as typeof DOMMatrix;
-
-    globalThis.DOMMatrix = DOMMatrixPolyfill;
-  }
-
-  const { PDFParse } = await import("pdf-parse");
-  const parser = new PDFParse({ data: buffer });
+  const pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const pdfjs = pdfjsModule as typeof import("pdfjs-dist/legacy/build/pdf.mjs");
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buffer),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    disableFontFace: true,
+  });
+  const pdfDocument = await loadingTask.promise;
 
   try {
-    const result = await parser.getText();
-    return normalizeExtractedText(result.text);
+    const pages: string[] = [];
+
+    for (let pageIndex = 1; pageIndex <= pdfDocument.numPages; pageIndex += 1) {
+      const page = await pdfDocument.getPage(pageIndex);
+      const textContent = await page.getTextContent();
+      const pageText = normalizeExtractedText(
+        textContent.items
+          .map((item) => ("str" in item ? item.str : ""))
+          .join(" ")
+      );
+
+      if (pageText) {
+        pages.push(pageText);
+      }
+
+      page.cleanup();
+    }
+
+    return normalizeExtractedText(pages.join("\n\n"));
   } finally {
-    await parser.destroy();
+    await loadingTask.destroy();
   }
 }
 
