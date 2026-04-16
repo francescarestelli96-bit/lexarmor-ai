@@ -877,20 +877,38 @@ export function ContractStudio({
                     Signal map
                   </p>
                   <div className="mt-4 flex flex-col gap-4 sm:gap-5 md:flex-row">
-                    <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
-                      <div className="flex flex-col items-center gap-4">
+                    <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-3 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
+                      <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400 md:mb-4">
+                        Mobile signal focus
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 md:flex md:flex-col md:items-center md:gap-4">
                         {panels.map((panel) => {
                           const isActive = smartRiskState?.level === panel.key;
 
                           return (
                             <div
                               key={`signal-dot-${panel.key}`}
-                              className={`h-16 w-16 rounded-full border transition sm:h-20 sm:w-20 ${
-                                isActive
-                                  ? `${panel.dotClass} scale-100`
-                                  : "border-white/10 bg-slate-900/90 opacity-35"
-                              }`}
-                            />
+                              className="flex flex-col items-center gap-2"
+                            >
+                              <div
+                                className={`h-20 w-20 rounded-full border transition md:h-20 md:w-20 ${
+                                  isActive
+                                    ? `${panel.dotClass} scale-[1.04]`
+                                    : "border-white/10 bg-slate-900/90 opacity-40"
+                                }`}
+                              />
+                              <span
+                                className={`text-center text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                                  isActive ? panel.signalText : "text-slate-500"
+                                }`}
+                              >
+                                {panel.key === "critical"
+                                  ? "Critical"
+                                  : panel.key === "medium"
+                                    ? "Attention"
+                                    : "Safe"}
+                              </span>
+                            </div>
                           );
                         })}
                       </div>
@@ -1090,20 +1108,20 @@ export function ContractStudio({
                 ))}
               </div>
 
-              <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                  Risk signals
-                </p>
-                <div className="mt-4 space-y-3">
-                  {panels.map((panel) => (
+                <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Risk signals
+                  </p>
+                  <div className="mt-4 space-y-3">
+                    {panels.map((panel) => (
                     <div
                       key={`empty-${panel.key}`}
                       className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
                     >
                       <div className="flex items-center gap-4">
-                        <div
-                          className={`h-12 w-12 rounded-full border ${panel.dotClass}`}
-                        />
+                          <div
+                            className={`h-14 w-14 rounded-full border shadow-[0_0_28px_rgba(255,255,255,0.06)] ${panel.dotClass}`}
+                          />
                         <div>
                           <p className={`text-sm font-semibold ${panel.signalText}`}>
                             {panel.title}
