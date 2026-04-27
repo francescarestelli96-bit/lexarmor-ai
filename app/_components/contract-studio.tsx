@@ -587,6 +587,130 @@ export function ContractStudio({
   }, [analysis, groupedClauses.critical.length, groupedClauses.medium.length]);
 
   const riskScoreClass = smartRiskState?.scoreClass ?? "text-white";
+  const signalMapCard = (
+    <div className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-4 shadow-[0_20px_70px_rgba(2,6,23,0.4)] sm:rounded-[1.7rem] sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+            Semaforo rischio
+          </p>
+          <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">
+            Il segnale operativo più importante del documento.
+          </p>
+        </div>
+        {smartRiskState ? (
+          <div
+            className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${smartRiskState.frameClass}`}
+          >
+            {smartRiskState.label}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-4 lg:flex-row">
+        <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-3 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
+          <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400 md:mb-4">
+            Focus segnali
+          </p>
+          <div className="grid grid-cols-3 gap-2 md:flex md:flex-col md:items-center md:gap-4">
+            {panels.map((panel) => {
+              const isActive = smartRiskState?.level === panel.key;
+
+              return (
+                <div
+                  key={`signal-dot-${panel.key}`}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div
+                    className={`h-20 w-20 rounded-full border transition md:h-20 md:w-20 ${
+                      isActive
+                        ? `${panel.dotClass} scale-[1.04]`
+                        : "border-white/10 bg-slate-900/90 opacity-40"
+                    }`}
+                  />
+                  <span
+                    className={`text-center text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                      isActive ? panel.signalText : "text-slate-500"
+                    }`}
+                  >
+                    {panel.key === "critical"
+                      ? "Critico"
+                      : panel.key === "medium"
+                        ? "Attenzione"
+                        : "Sicuro"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          {smartRiskState ? (
+            <div
+              className={`rounded-[1.35rem] border p-4 ${smartRiskState.frameClass}`}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-300">
+                Soglia intelligente
+              </p>
+              <p
+                className={`mt-3 text-2xl font-semibold tracking-[-0.04em] ${smartRiskState.scoreClass}`}
+              >
+                {smartRiskState.label}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-200">
+                {smartRiskState.helper}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mt-4 space-y-3">
+            {panels.map((panel) => {
+              const isActive = smartRiskState?.level === panel.key;
+
+              return (
+                <div
+                  key={`signal-${panel.key}`}
+                  className={`rounded-[1.2rem] border p-3 transition ${
+                    isActive
+                      ? `${panel.signalTone} shadow-[0_0_0_1px_rgba(255,255,255,0.05)]`
+                      : "border-white/8 bg-white/[0.03]"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`h-5 w-5 rounded-full border ${
+                        isActive
+                          ? panel.dotClass
+                          : "border-white/10 bg-slate-700"
+                      }`}
+                    />
+                    <div className="min-w-0">
+                      <p
+                        className={`text-sm font-semibold ${
+                          isActive ? panel.signalText : "text-white"
+                        }`}
+                      >
+                        {panel.title}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-slate-300">
+                        {panel.subtitle}
+                      </p>
+                    </div>
+                    <div
+                      className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${panel.badge}`}
+                    >
+                      {panel.items.length}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -842,7 +966,9 @@ export function ContractStudio({
         ) : analysis ? (
           <div className="mt-6 space-y-4">
             <div className="rounded-[1.45rem] border border-white/8 bg-white/5 p-4 sm:rounded-[1.6rem] sm:p-5">
-              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+              {signalMapCard}
+
+              <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                 <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-200">
                   {analysis.contractType}
                 </div>
@@ -856,130 +982,26 @@ export function ContractStudio({
                 ))}
               </div>
 
-              <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.9fr)_minmax(340px,400px)]">
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                      Risk score
-                    </p>
-                    <div
-                      className={`mt-2 text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${riskScoreClass}`}
-                    >
-                      {analysis.riskScore}
-                      <span className="ml-1 text-2xl text-slate-500 sm:text-3xl">/100</span>
-                    </div>
-                  </div>
-                  <p className="max-w-xl text-sm leading-7 text-slate-300">
-                    {analysis.summary}
+              <div className="mt-5 grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Risk score
                   </p>
+                  <div
+                    className={`mt-2 text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${riskScoreClass}`}
+                  >
+                    {analysis.riskScore}
+                    <span className="ml-1 text-2xl text-slate-500 sm:text-3xl">/100</span>
+                  </div>
                 </div>
 
-                <div className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-4 shadow-[0_20px_70px_rgba(2,6,23,0.4)] sm:rounded-[1.7rem] sm:p-5">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                    Mappa segnali
+                <div className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 px-4 py-4 sm:px-5">
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Sintesi operativa
                   </p>
-                  <div className="mt-4 flex flex-col gap-4 sm:gap-5 md:flex-row">
-                    <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-3 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
-                      <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400 md:mb-4">
-                        Focus segnali
-                      </p>
-                      <div className="grid grid-cols-3 gap-2 md:flex md:flex-col md:items-center md:gap-4">
-                        {panels.map((panel) => {
-                          const isActive = smartRiskState?.level === panel.key;
-
-                          return (
-                            <div
-                              key={`signal-dot-${panel.key}`}
-                              className="flex flex-col items-center gap-2"
-                            >
-                              <div
-                                className={`h-20 w-20 rounded-full border transition md:h-20 md:w-20 ${
-                                  isActive
-                                    ? `${panel.dotClass} scale-[1.04]`
-                                    : "border-white/10 bg-slate-900/90 opacity-40"
-                                }`}
-                              />
-                              <span
-                                className={`text-center text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                                  isActive ? panel.signalText : "text-slate-500"
-                                }`}
-                              >
-                                {panel.key === "critical"
-                                  ? "Critico"
-                                  : panel.key === "medium"
-                                    ? "Attenzione"
-                                    : "Sicuro"}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      {smartRiskState ? (
-                        <div
-                          className={`rounded-[1.35rem] border p-4 ${smartRiskState.frameClass}`}
-                        >
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-300">
-                            Soglia intelligente
-                          </p>
-                          <p
-                            className={`mt-3 text-2xl font-semibold tracking-[-0.04em] ${smartRiskState.scoreClass}`}
-                          >
-                            {smartRiskState.label}
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-200">
-                            {smartRiskState.helper}
-                          </p>
-                        </div>
-                      ) : null}
-
-                      <div className="mt-4 space-y-3">
-                        {panels.map((panel) => {
-                          const isActive = smartRiskState?.level === panel.key;
-
-                          return (
-                            <div
-                              key={`signal-${panel.key}`}
-                              className={`rounded-[1.2rem] border p-3 transition ${
-                                isActive
-                                  ? `${panel.signalTone} shadow-[0_0_0_1px_rgba(255,255,255,0.05)]`
-                                  : "border-white/8 bg-white/[0.03]"
-                              }`}
-                            >
-                              <div className="flex items-center gap-4">
-                                <div
-                                  className={`h-5 w-5 rounded-full border ${
-                                    isActive
-                                      ? panel.dotClass
-                                      : "border-white/10 bg-slate-700"
-                                  }`}
-                                />
-                                <div className="min-w-0">
-                                  <p
-                                    className={`text-sm font-semibold ${
-                                      isActive ? panel.signalText : "text-white"
-                                    }`}
-                                  >
-                                    {panel.title}
-                                  </p>
-                                  <p className="mt-1 text-xs leading-5 text-slate-300">
-                                    {panel.subtitle}
-                                  </p>
-                                </div>
-                                <div
-                                  className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${panel.badge}`}
-                                >
-                                  {panel.items.length}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">
+                    {analysis.summary}
+                  </p>
                 </div>
               </div>
             </div>
