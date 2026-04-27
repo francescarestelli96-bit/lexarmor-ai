@@ -63,17 +63,17 @@ type ContractStudioProps = {
 
 const verdictCopy = {
   critical: {
-    label: "High risk",
+    label: "Rischio alto",
     badgeClass:
       "bg-red-400/15 text-red-200 ring-1 ring-inset ring-red-400/25",
   },
   review: {
-    label: "Needs review",
+    label: "Da rivedere",
     badgeClass:
       "bg-amber-300/15 text-amber-100 ring-1 ring-inset ring-amber-300/25",
   },
   safe: {
-    label: "Mostly standard",
+    label: "Perlopiù standard",
     badgeClass:
       "bg-emerald-400/15 text-emerald-100 ring-1 ring-inset ring-emerald-400/25",
   },
@@ -81,17 +81,17 @@ const verdictCopy = {
 
 const severityCopy = {
   critical: {
-    label: "Critical",
+    label: "Critico",
     icon: AlertTriangle,
     className: "text-red-300",
   },
   medium: {
-    label: "Attention",
+    label: "Attenzione",
     icon: Shield,
     className: "text-amber-200",
   },
   safe: {
-    label: "Safe",
+    label: "Sicura",
     icon: CheckCircle2,
     className: "text-emerald-200",
   },
@@ -108,9 +108,9 @@ const demoScriptText = `SCRITTURA PROFESSIONALE TRA COMMITTENTE E CONSULENTE
 Tra ALFA SRL (Committente) e Mario Rossi (Consulente) si conviene quanto segue:
 1) Oggetto: supporto strategico e operativo per 6 mesi.
 2) Corrispettivo: euro 1.500 mensili, pagamento a 90 giorni data fattura.
-3) Penale: in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilita'.
+3) Penale: in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilità.
 4) Non concorrenza: divieto di collaborare con concorrenti per 24 mesi senza compenso dedicato.
-5) Responsabilita': il Consulente risponde per ogni danno diretto e indiretto, senza limiti.
+5) Responsabilità: il Consulente risponde per ogni danno diretto e indiretto, senza limiti.
 6) Foro competente esclusivo: Milano.
 7) Riservatezza: obbligo per entrambe le parti per 5 anni.
 8) Trattamento dati: le parti dichiarano di operare nel rispetto delle norme applicabili.`;
@@ -119,7 +119,7 @@ const demoAnalysisPayload: AnalysisResponse = {
   contractType: "Contratto di consulenza professionale",
   parties: ["ALFA SRL", "Mario Rossi"],
   summary:
-    "Documento professionale con diverse clausole sbilanciate a sfavore del consulente. Le aree piu' critiche riguardano penale, non concorrenza e responsabilita' illimitata. Struttura recuperabile con revisione mirata delle clausole economiche e di rischio.",
+    "Documento professionale con diverse clausole sbilanciate a sfavore del consulente. Le aree più critiche riguardano penale, non concorrenza e responsabilità illimitata. Struttura recuperabile con revisione mirata delle clausole economiche e di rischio.",
   verdict: "review",
   riskScore: 78,
   clauses: [
@@ -127,20 +127,20 @@ const demoAnalysisPayload: AnalysisResponse = {
       title: "Penale eccessiva su recesso anticipato",
       severity: "critical",
       explanation:
-        "Penale pari a 6 mensilita' senza criterio di proporzionalita'. Clausola potenzialmente squilibrata rispetto all'interesse del committente.",
+        "Penale pari a 6 mensilità senza criterio di proporzionalità. Clausola potenzialmente squilibrata rispetto all'interesse del committente.",
       excerpt:
-        "in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilita'",
+        "in caso di recesso del Consulente prima della scadenza, penale pari a 6 mensilità",
     },
     {
       title: "Non concorrenza post-contrattuale senza corrispettivo",
       severity: "critical",
       explanation:
-        "Vincolo di 24 mesi senza compenso dedicato: forte rischio di invalidita' o riduzione, da rinegoziare in durata, perimetro e corrispettivo.",
+        "Vincolo di 24 mesi senza compenso dedicato: forte rischio di invalidità o riduzione, da rinegoziare in durata, perimetro e corrispettivo.",
       excerpt:
         "divieto di collaborare con concorrenti per 24 mesi senza compenso dedicato",
     },
     {
-      title: "Responsabilita' illimitata su danni indiretti",
+      title: "Responsabilità illimitata su danni indiretti",
       severity: "medium",
       explanation:
         "Assunzione di rischio eccessiva: manca un tetto massimo e manca distinzione tra colpa lieve, grave e dolo.",
@@ -157,13 +157,13 @@ const demoAnalysisPayload: AnalysisResponse = {
   ],
   hiddenObligations: [
     "Il pagamento a 90 giorni espone il consulente a un carico finanziario non neutro.",
-    "La combinazione tra penale e non concorrenza riduce fortemente la liberta' professionale.",
-    "La responsabilita' illimitata puo' trasferire sul consulente rischi estranei al compenso pattuito.",
+    "La combinazione tra penale e non concorrenza riduce fortemente la libertà professionale.",
+    "La responsabilità illimitata può trasferire sul consulente rischi estranei al compenso pattuito.",
   ],
   negotiationMoves: [
     "Ridurre la penale con criterio progressivo o limite massimo ragionevole.",
     "Inserire compenso specifico per non concorrenza e ridurre durata/ambito territoriale.",
-    "Introdurre cap di responsabilita' legato al valore complessivo del contratto.",
+    "Introdurre un cap di responsabilità legato al valore complessivo del contratto.",
     "Portare termini pagamento da 90 a 30 giorni o inserire interessi automatici per ritardo.",
   ],
   disclaimer:
@@ -172,15 +172,15 @@ const demoAnalysisPayload: AnalysisResponse = {
 
 const complianceBadges = [
   {
-    label: "256-bit Encryption",
+    label: "Crittografia 256-bit",
     icon: LockKeyhole,
   },
   {
-    label: "GDPR Compliant",
+    label: "Compatibile con GDPR",
     icon: Fingerprint,
   },
   {
-    label: "No Data Retention",
+    label: "Nessuna conservazione permanente",
     icon: ShieldCheck,
   },
 ];
@@ -215,7 +215,7 @@ function formatAccessLabel(access: AccessState) {
   }
 
   if (access.isAdmin) {
-    return "Admin test access";
+    return "Accesso admin di test";
   }
 
   if (access.plan === "basic") {
@@ -320,7 +320,7 @@ export function ContractStudio({
       setUploadNotice(
         data.detectedType === "pdf-ocr"
           ? `${data.filename ?? file.name} caricato correttamente. Ho rilevato un PDF scannerizzato e ho estratto il testo con OCR.`
-          : `${data.filename ?? file.name} caricato correttamente. Il testo e' pronto per l'analisi.`
+          : `${data.filename ?? file.name} caricato correttamente. Il testo è pronto per l'analisi.`
       );
     } catch (upload) {
       setUploadError(
@@ -390,7 +390,7 @@ export function ContractStudio({
           setAnalysis(demoAnalysisPayload);
         });
         setUploadNotice(
-          "Demo completata. Questo output e' simulato per presentazione marketing."
+          "Demo completata. Questo output è simulato per presentazione marketing."
         );
       } finally {
         setIsPending(false);
@@ -446,7 +446,7 @@ export function ContractStudio({
 
       if (access.plan === "basic" && data.access && !data.access.hasAccess) {
         setUploadNotice(
-          "Il pass Basic e' stato utilizzato. Per una nuova analisi puoi acquistare un altro pass oppure attivare Pro."
+          "Il pass Basic è stato utilizzato. Per una nuova analisi puoi acquistare un altro pass oppure attivare Pro."
         );
       }
     } catch (err) {
@@ -479,8 +479,8 @@ export function ContractStudio({
   const panels = [
     {
       key: "critical",
-      title: "Critical Risks",
-      subtitle: "Clausole squilibrate, penali e responsabilita' critiche",
+      title: "Rischi critici",
+      subtitle: "Clausole squilibrate, penali e responsabilità critiche",
       tone:
         "border-red-500/30 bg-[linear-gradient(180deg,rgba(127,29,29,0.28),rgba(15,23,42,0.82))]",
       badge:
@@ -492,11 +492,11 @@ export function ContractStudio({
         "border-red-400/55 bg-red-500 shadow-[0_0_42px_rgba(239,68,68,0.55)]",
       itemTone: "border-red-500/15 bg-[#14090d]",
       items: groupedClauses.critical,
-      empty: "Nessuna criticita' elevata rilevata.",
+      empty: "Nessuna criticità elevata rilevata.",
     },
     {
       key: "medium",
-      title: "Attention Required",
+      title: "Attenzione richiesta",
       subtitle: "Punti da chiarire, rinegoziare o completare",
       tone:
         "border-amber-400/28 bg-[linear-gradient(180deg,rgba(120,53,15,0.24),rgba(15,23,42,0.82))]",
@@ -513,7 +513,7 @@ export function ContractStudio({
     },
     {
       key: "safe",
-      title: "Standard / Safe",
+      title: "Standard / sicure",
       subtitle: "Clausole coerenti o non anomale per il contesto",
       tone:
         "border-emerald-400/28 bg-[linear-gradient(180deg,rgba(6,95,70,0.24),rgba(15,23,42,0.82))]",
@@ -548,12 +548,12 @@ export function ContractStudio({
     ) {
       return {
         level: "critical" as const,
-        label: "Critical exposure",
+        label: "Esposizione critica",
         scoreClass: "text-red-200",
         frameClass:
           "border-red-500/30 bg-[linear-gradient(180deg,rgba(127,29,29,0.28),rgba(15,23,42,0.74))]",
         helper:
-          "Segnale rosso attivato: il punteggio e la densita' di clausole critiche indicano rischio legale o economico immediato.",
+          "Segnale rosso attivato: il punteggio e la densità di clausole critiche indicano un rischio legale o economico immediato.",
       };
     }
 
@@ -566,7 +566,7 @@ export function ContractStudio({
     ) {
       return {
         level: "medium" as const,
-        label: "Elevated review",
+        label: "Revisione elevata",
         scoreClass: "text-amber-100",
         frameClass:
           "border-amber-400/30 bg-[linear-gradient(180deg,rgba(120,53,15,0.22),rgba(15,23,42,0.74))]",
@@ -577,12 +577,12 @@ export function ContractStudio({
 
     return {
       level: "safe" as const,
-      label: "Controlled risk",
+      label: "Rischio controllato",
       scoreClass: "text-emerald-200",
       frameClass:
         "border-emerald-400/28 bg-[linear-gradient(180deg,rgba(6,95,70,0.22),rgba(15,23,42,0.74))]",
       helper:
-        "Segnale verde attivato: la struttura appare piu' standard e con un profilo di rischio piu' contenuto.",
+        "Segnale verde attivato: la struttura appare più standard e con un profilo di rischio più contenuto.",
     };
   }, [analysis, groupedClauses.critical.length, groupedClauses.medium.length]);
 
@@ -605,7 +605,7 @@ export function ContractStudio({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-xl">
               <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Document intake
+                Caricamento documento
               </p>
               <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl lg:text-3xl">
                 Carica o incolla il documento legale da analizzare.
@@ -703,7 +703,7 @@ export function ContractStudio({
         >
           <div className="flex items-center justify-between gap-3 border-b border-white/8 px-5 py-3">
             <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Workspace text
+              Testo del documento
             </span>
             <button
               type="button"
@@ -801,7 +801,7 @@ export function ContractStudio({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Risk dashboard
+              Cruscotto rischio
             </p>
             <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl lg:text-3xl">
               {analysis ? "Analisi completata" : "In attesa di un documento"}
@@ -876,12 +876,12 @@ export function ContractStudio({
 
                 <div className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,31,0.98),rgba(7,16,28,0.96))] p-4 shadow-[0_20px_70px_rgba(2,6,23,0.4)] sm:rounded-[1.7rem] sm:p-5">
                   <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                    Signal map
+                    Mappa segnali
                   </p>
                   <div className="mt-4 flex flex-col gap-4 sm:gap-5 md:flex-row">
                     <div className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(4,8,15,0.96))] px-3 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-6">
                       <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400 md:mb-4">
-                        Mobile signal focus
+                        Focus segnali
                       </p>
                       <div className="grid grid-cols-3 gap-2 md:flex md:flex-col md:items-center md:gap-4">
                         {panels.map((panel) => {
@@ -905,10 +905,10 @@ export function ContractStudio({
                                 }`}
                               >
                                 {panel.key === "critical"
-                                  ? "Critical"
+                                  ? "Critico"
                                   : panel.key === "medium"
-                                    ? "Attention"
-                                    : "Safe"}
+                                    ? "Attenzione"
+                                    : "Sicuro"}
                               </span>
                             </div>
                           );
@@ -922,7 +922,7 @@ export function ContractStudio({
                           className={`rounded-[1.35rem] border p-4 ${smartRiskState.frameClass}`}
                         >
                           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-300">
-                            Smart thresholding
+                            Soglia intelligente
                           </p>
                           <p
                             className={`mt-3 text-2xl font-semibold tracking-[-0.04em] ${smartRiskState.scoreClass}`}
@@ -1049,7 +1049,7 @@ export function ContractStudio({
             <div className="grid gap-4 xl:grid-cols-2">
               <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.04] p-4 sm:rounded-[1.5rem] sm:p-5">
                 <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                  Hidden obligations
+                  Obblighi nascosti
                 </p>
                 <ul className="mt-4 space-y-3">
                   {analysis.hiddenObligations.map((item) => (
@@ -1065,7 +1065,7 @@ export function ContractStudio({
 
               <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.04] p-4 sm:rounded-[1.5rem] sm:p-5">
                 <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                  Negotiation moves
+                  Leve di negoziazione
                 </p>
                 <ul className="mt-4 space-y-3">
                   {analysis.negotiationMoves.map((item) => (
@@ -1098,7 +1098,7 @@ export function ContractStudio({
               <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
                 {[
                   "Classificazione del documento legale",
-                  "Risk score e severita' operative",
+                  "Risk score e severità operative",
                   "Obblighi nascosti e negoziazione",
                 ].map((item) => (
                   <div
@@ -1112,7 +1112,7 @@ export function ContractStudio({
 
                 <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
                   <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Risk signals
+                    Segnali di rischio
                   </p>
                   <div className="mt-4 space-y-3">
                     {panels.map((panel) => (

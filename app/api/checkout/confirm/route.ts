@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     if (!stripe) {
       return Response.json(
-        { error: "Stripe non e' configurato sul server." },
+        { error: "Stripe non è configurato sul server." },
         { status: 503 }
       );
     }

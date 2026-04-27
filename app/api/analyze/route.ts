@@ -396,23 +396,23 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 24,
       patterns: [/\bpenale\b/i, /maggior danno/i, /caparra/i],
       explanation:
-        "La clausola richiede verifica di proporzionalita' rispetto all'interesse tutelato; in area contrattuale il tema richiama la logica degli artt. 1382 ss. c.c. e il controllo su squilibrio o eccessivita'.",
+        "La clausola richiede verifica di proporzionalità rispetto all'interesse tutelato; in area contrattuale il tema richiama la logica degli artt. 1382 ss. c.c. e il controllo su squilibrio o eccessività.",
       hiddenObligation:
         "In caso di inadempimento o recesso anticipato potresti dover pagare importi ulteriori rispetto al compenso pattuito.",
       negotiationMove:
         "Chiedi un limite massimo chiaro della penale e criteri di riduzione proporzionali al danno effettivo.",
     },
     {
-      title: "Responsabilita' illimitata o manleva troppo estesa",
+      title: "Responsabilità illimitata o manleva troppo estesa",
       severity: "critical",
       score: 22,
       patterns: [/senza limiti/i, /danni? diretti e indiretti/i, /manleva/i],
       explanation:
-        "Una responsabilita' senza cap o estesa anche ai danni indiretti puo' trasferire sul firmatario un rischio economico sproporzionato rispetto al valore dell'accordo.",
+        "Una responsabilità senza cap o estesa anche ai danni indiretti può trasferire sul firmatario un rischio economico sproporzionato rispetto al valore dell'accordo.",
       hiddenObligation:
-        "Il documento puo' spostare su di te rischi economici non compatibili con il compenso o con il ruolo ricoperto.",
+        "Il documento può spostare su di te rischi economici non compatibili con il compenso o con il ruolo ricoperto.",
       negotiationMove:
-        "Inserisci un tetto di responsabilita' collegato al valore dell'accordo ed escludi i danni indiretti salvo dolo o colpa grave.",
+        "Inserisci un tetto di responsabilità collegato al valore dell'accordo ed escludi i danni indiretti salvo dolo o colpa grave.",
     },
     {
       title: "Vincolo di non concorrenza o esclusiva da verificare",
@@ -420,11 +420,11 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 18,
       patterns: [/non concorrenza/i, /\besclusiva\b/i, /concorrent/i],
       explanation:
-        "Un vincolo post-contrattuale o di esclusiva va controllato per durata, ambito e corrispettivo; in ambito lavoro e prestazioni professionali un patto troppo ampio puo' essere aggredibile.",
+        "Un vincolo post-contrattuale o di esclusiva va controllato per durata, ambito e corrispettivo; in ambito lavoro e prestazioni professionali un patto troppo ampio può essere aggredibile.",
       hiddenObligation:
-        "Potresti limitare attivita' future o incarichi con terzi anche dopo la fine del rapporto.",
+        "Potresti limitare attività future o incarichi con terzi anche dopo la fine del rapporto.",
       negotiationMove:
-        "Riduci durata e perimetro del vincolo e prevedi un corrispettivo specifico se limita attivita' future.",
+        "Riduci durata e perimetro del vincolo e prevedi un corrispettivo specifico se limita attività future.",
     },
     {
       title: "Termini di opposizione o impugnazione da presidiare",
@@ -432,9 +432,9 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 24,
       patterns: [/opposizion/i, /impugnazion/i, /entro \d+ giorni/i, /tar/i, /prefetto/i],
       explanation:
-        "Se l'atto contiene scadenze per reagire, il rischio principale e' la decadenza: nei procedimenti penali o amministrativi la tempestivita' difensiva e' decisiva.",
+        "Se l'atto contiene scadenze per reagire, il rischio principale è la decadenza: nei procedimenti penali o amministrativi la tempestività difensiva è decisiva.",
       hiddenObligation:
-        "Il testo puo' imporre attivita' difensive o documentali in tempi molto stretti.",
+        "Il testo può imporre attività difensive o documentali in tempi molto stretti.",
       negotiationMove:
         "Annota subito il termine utile e prepara il fascicolo con i documenti necessari per opposizione o ricorso.",
     },
@@ -448,7 +448,7 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       hiddenObligation:
         "Potresti sostenere il costo della prestazione per un periodo lungo prima di incassare.",
       negotiationMove:
-        "Richiedi termini di pagamento piu' brevi o interessi automatici per ritardo.",
+        "Richiedi termini di pagamento più brevi o interessi automatici per ritardo.",
     },
     {
       title: "Foro competente o sede del contenzioso da confermare",
@@ -456,7 +456,7 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 10,
       patterns: [/foro competente/i, /competenza esclusiva/i],
       explanation:
-        "La clausola sulla competenza puo' incidere sul costo del contenzioso e sulla praticabilita' della difesa; va valutata in base al rapporto concreto e all'eventuale parte debole.",
+        "La clausola sulla competenza può incidere sul costo del contenzioso e sulla praticabilità della difesa; va valutata in base al rapporto concreto e all'eventuale parte debole.",
       hiddenObligation:
         "Un eventuale contenzioso potrebbe dover essere gestito lontano dalla tua sede o residenza.",
       negotiationMove:
@@ -468,9 +468,9 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 8,
       patterns: [/registrare/i, /riprese?/i, /uso promozionale/i, /archivio/i],
       explanation:
-        "Le autorizzazioni su registrazioni e utilizzi promozionali vanno delimitate per finalita', durata e mezzi di diffusione.",
+        "Le autorizzazioni su registrazioni e utilizzi promozionali vanno delimitate per finalità, durata e mezzi di diffusione.",
       hiddenObligation:
-        "Il documento puo' consentire riuso dell'immagine, della prestazione o del contenuto oltre l'evento principale.",
+        "Il documento può consentire riuso dell'immagine, della prestazione o del contenuto oltre l'evento principale.",
       negotiationMove:
         "Limita l'autorizzazione a finalita' specifiche e richiedi approvazione preventiva per usi ulteriori.",
     },
@@ -480,19 +480,19 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       score: 8,
       patterns: [/autorizzazione/i, /pubblica amministrazione/i, /art\.? 53/i, /d\.?\s*lgs/i],
       explanation:
-        "Il testo richiama oneri dichiarativi o autorizzativi che, se non rispettati, possono incidere sulla validita' dell'incarico o esporre a contestazioni.",
+        "Il testo richiama oneri dichiarativi o autorizzativi che, se non rispettati, possono incidere sulla validità dell'incarico o esporre a contestazioni.",
       hiddenObligation:
         "Potresti dover consegnare autorizzazioni, attestazioni o documenti integrativi prima dell'esecuzione.",
       negotiationMove:
         "Verifica subito chi deve produrre l'autorizzazione e inserisci una condizione sospensiva se manca un presupposto essenziale.",
     },
     {
-      title: "Forza maggiore o impossibilita' dell'adempimento disciplinata",
+      title: "Forza maggiore o impossibilità dell'adempimento disciplinata",
       severity: "safe",
       score: -6,
       patterns: [/forza maggiore/i, /impossibilita' dell'adempimento/i, /impossibilità dell'adempimento/i],
       explanation:
-        "La presenza di una clausola su forza maggiore o impossibilita' sopravvenuta e' coerente con una corretta gestione del rischio operativo.",
+        "La presenza di una clausola su forza maggiore o impossibilità sopravvenuta è coerente con una corretta gestione del rischio operativo.",
     },
     {
       title: "Riservatezza o autorizzazione bilaterale presente",
@@ -524,12 +524,12 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
       title: "Screening preliminare: revisione umana consigliata",
       severity: "medium",
       explanation:
-        "Il testo non espone trigger evidenti nelle categorie automatiche, ma resta opportuno verificare obblighi, termini e responsabilita' prima della firma o del deposito.",
+        "Il testo non espone trigger evidenti nelle categorie automatiche, ma resta opportuno verificare obblighi, termini e responsabilità prima della firma o del deposito.",
       excerpt: findExcerpt(contractText, [/./]),
     });
     pushUnique(
       negotiationMoves,
-      "Chiedi una revisione professionale mirata dei punti economici, dei termini e delle responsabilita'."
+      "Chiedi una revisione professionale mirata dei punti economici, dei termini e delle responsabilità."
     );
   }
 
@@ -571,10 +571,10 @@ function buildLocalFallbackAnalysis(contractText: string): AnalysisModelPayload 
     `Classificazione preliminare: ${documentClassification}.`,
     criticalCount
       ? `Emergono ${criticalCount} profili critici con possibile impatto economico o legale immediato.`
-      : "Non emergono red flag immediate nelle categorie automatiche piu' sensibili.",
+      : "Non emergono red flag immediate nelle categorie automatiche più sensibili.",
     mediumCount
       ? `Ci sono ${mediumCount} punti da chiarire o rinegoziare prima di procedere.`
-      : "La struttura appare piu' ordinata, ma resta consigliata una verifica professionale finale.",
+      : "La struttura appare più ordinata, ma resta consigliata una verifica professionale finale.",
   ].join(" ");
 
   return {
@@ -602,7 +602,7 @@ export async function POST(request: Request) {
       const deniedResponse = NextResponse.json(
         {
           error:
-            "Per avviare l'analisi serve un accesso attivo. Scegli Basic o Pro dal pannello Plans.",
+            "Per avviare l'analisi serve un accesso attivo. Scegli Basic o Pro dal pannello Piani.",
           code: "payment_required",
           access: toClientAccessState(synced.access),
         },

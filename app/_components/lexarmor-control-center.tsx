@@ -34,16 +34,16 @@ type CheckoutBanner = {
 };
 
 const fullTabs: Array<{ id: TabId; label: string }> = [
-  { id: "analysis", label: "Analysis" },
-  { id: "plans", label: "Plans" },
-  { id: "security", label: "Security" },
-  { id: "segments", label: "Segments" },
+  { id: "analysis", label: "Analisi" },
+  { id: "plans", label: "Piani" },
+  { id: "security", label: "Sicurezza" },
+  { id: "segments", label: "Segmenti" },
 ];
 
 const demoTabs: Array<{ id: TabId; label: string }> = [
-  { id: "analysis", label: "Demo Analysis" },
-  { id: "security", label: "Security" },
-  { id: "segments", label: "Use Cases" },
+  { id: "analysis", label: "Demo analisi" },
+  { id: "security", label: "Sicurezza" },
+  { id: "segments", label: "Casi d'uso" },
 ];
 
 const planCards = [
@@ -55,7 +55,7 @@ const planCards = [
     description: "Per revisioni singole prima della firma.",
     points: [
       "1 analisi documentale completa",
-      "Risk Score e clausole per severita'",
+      "Risk score e clausole per severità",
       "Obblighi nascosti e leve di negoziazione",
       "Upload documenti supportato",
     ],
@@ -86,17 +86,17 @@ const planCards = [
 
 const securityCards = [
   {
-    title: "256-bit Encryption",
+    title: "Crittografia 256-bit",
     body: "Trasmissione protetta tra browser e server durante l'intero flusso di analisi e checkout.",
     icon: LockKeyhole,
   },
   {
-    title: "GDPR Ready",
+    title: "Compatibile con GDPR",
     body: "Flusso impostato per una comunicazione privacy-first verso clienti, artisti, studi e agenzie.",
     icon: Fingerprint,
   },
   {
-    title: "No Data Retention",
+    title: "Nessuna conservazione permanente",
     body: "Il testo caricato non viene presentato in interfaccia come archivio permanente della piattaforma.",
     icon: ShieldCheck,
   },
@@ -110,7 +110,7 @@ const segmentCards = [
   },
   {
     title: "Team e Organizzazioni",
-    body: "Per aziende, agenzie, procurement, HR, compliance e realta' operative che vogliono un primo screening leggibile prima dell'escalation a legale o direzione.",
+    body: "Per aziende, agenzie, procurement, HR, compliance e realtà operative che vogliono un primo screening leggibile prima dell'escalation a legale o direzione.",
     icon: Building2,
   },
   {
@@ -121,7 +121,7 @@ const segmentCards = [
 ];
 
 const legalDisclaimer =
-  "LexArmor fornisce uno screening automatizzato a solo scopo informativo. Non costituisce consulenza legale, non sostituisce un avvocato e non assume responsabilita', nei limiti di legge, per decisioni, danni o conseguenze derivanti dall'uso del servizio o dei contenuti generati.";
+  "LexArmor fornisce uno screening automatizzato a solo scopo informativo. Non costituisce consulenza legale, non sostituisce un avvocato e non assume responsabilità, nei limiti di legge, per decisioni, danni o conseguenze derivanti dall'uso del servizio o dei contenuti generati.";
 
 const emptyAccessState: AccessState = {
   hasAccess: false,
@@ -138,7 +138,7 @@ const demoAccessState: AccessState = {
   plan: "pro",
   remainingScans: null,
   expiresAt: null,
-  label: "Demo access",
+  label: "Accesso demo",
   isAdmin: false,
   source: "admin",
 };
@@ -149,7 +149,7 @@ function formatAccessStatus(access: AccessState) {
   }
 
   if (access.isAdmin) {
-    return "Admin test access";
+    return "Accesso admin di test";
   }
 
   if (access.plan === "basic") {
@@ -216,20 +216,20 @@ function buildCheckoutSuccessBanner(plan: PlanId): CheckoutBanner {
     ? {
         tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
         title: "Accesso Basic attivato.",
-        body: "Il pagamento e' confermato. Puoi usare subito la tua analisi singola nel pannello Analysis.",
+        body: "Il pagamento è confermato. Puoi usare subito la tua analisi singola nel pannello Analisi.",
       }
     : {
         tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
         title: "Accesso Pro attivato.",
-        body: "L'abbonamento e' confermato. Il workspace e' pronto per un uso continuativo.",
+        body: "L'abbonamento è confermato. Il workspace è pronto per un uso continuativo.",
       };
 }
 
 const demoBanner: CheckoutBanner = {
   tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-100",
-  title: "Demo mode attiva.",
+  title: "Modalità demo attiva.",
   body:
-    "Questa workspace e' ottimizzata per registrare video marketing: analisi simulata, nessun checkout richiesto e narrativa stabile.",
+    "Questo workspace è ottimizzato per registrare video marketing: analisi simulata, nessun checkout richiesto e narrativa stabile.",
 };
 
 export function LexArmorControlCenter({
@@ -327,7 +327,7 @@ export function LexArmorControlCenter({
           tone: "border-white/10 bg-white/[0.04] text-slate-100",
           title: "Checkout interrotto.",
           body:
-            "Nessun addebito effettuato. Puoi riprendere il pagamento in qualsiasi momento dal pannello Plans.",
+            "Nessun addebito effettuato. Puoi riprendere il pagamento in qualsiasi momento dal pannello Piani.",
         });
         setActiveTab("plans");
         replaceUrlWithTab("plans");
@@ -357,7 +357,7 @@ export function LexArmorControlCenter({
                   LexArmor
                 </div>
                 <div className="text-[11px] uppercase tracking-[0.22em] text-slate-400 sm:text-xs sm:tracking-[0.24em]">
-                  {demoMode ? "Social demo workspace" : "Contract risk analysis"}
+                  {demoMode ? "Workspace demo social" : "Analisi rischio contrattuale"}
                 </div>
               </div>
             </div>
@@ -365,21 +365,21 @@ export function LexArmorControlCenter({
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               {demoMode ? (
                 <span className="rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
-                  Demo Reel Mode
+                  Modalità demo
                 </span>
               ) : null}
               <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
-                Encrypted transmission
+                Trasmissione cifrata
               </span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
-                No data retention
+                Nessuna conservazione permanente
               </span>
               <button
                 type="button"
                 onClick={() => setActiveTab("analysis")}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200 sm:w-auto"
               >
-                Open analysis
+                Apri analisi
                 <ArrowUpRight size={15} />
               </button>
             </div>
@@ -568,7 +568,7 @@ function PlansBoard({
       onCheckoutBannerChange({
         tone: "border-white/10 bg-white/[0.04] text-slate-100",
         title: "Accesso admin rimosso.",
-        body: "Il browser e' tornato allo stato standard del workspace.",
+        body: "Il browser è tornato allo stato standard del workspace.",
       });
     } catch {
       setAdminError(
@@ -584,7 +584,7 @@ function PlansBoard({
       <div className="grid gap-4 2xl:grid-cols-[0.9fr_1.1fr]">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-            Commercial plans
+            Piani
           </p>
           <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
             Accessi pronti per Stripe Checkout.
@@ -597,7 +597,7 @@ function PlansBoard({
 
         <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-            Access status
+            Stato accesso
           </p>
           <div className="mt-3 text-lg font-semibold text-white">
             {accessLoading ? "Verifica accesso in corso..." : formatAccessStatus(access)}
@@ -606,7 +606,7 @@ function PlansBoard({
             {access.hasAccess
               ? access.isAdmin
                 ? "Accesso interno attivo per testare il prodotto senza acquisto."
-                : "Puoi tornare subito nel pannello Analysis e usare il workspace."
+                : "Puoi tornare subito nel pannello Analisi e usare il workspace."
               : "Completa il checkout e l'accesso viene attivato automaticamente su questo browser."}
           </p>
           {!accessLoading && access.hasAccess ? (
@@ -622,7 +622,7 @@ function PlansBoard({
           {adminConfigured ? (
             <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-slate-950/40 p-4">
               <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Internal testing
+                Test interno
               </p>
               <h3 className="mt-2 text-base font-semibold text-white">
                 Accesso admin per test
@@ -740,7 +740,7 @@ function SecurityBoard() {
     <div className="space-y-4">
       <div className="max-w-3xl">
         <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Security posture
+          Sicurezza
         </p>
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
           Protezione leggibile, senza rumore inutile.
@@ -773,7 +773,7 @@ function SecurityBoard() {
 
         <div className="rounded-[1.8rem] border border-white/10 bg-slate-900/70 p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-            Operational trust
+            Fiducia operativa
           </p>
           <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
             Informazioni chiare vicino al flusso di lavoro.
@@ -782,7 +782,7 @@ function SecurityBoard() {
             {[
               "Privacy comunicata accanto al punto di upload",
               "Stato accesso e checkout integrati nel workspace",
-              "Badge di sicurezza visibili senza linguaggio promozionale",
+              "Segnali di sicurezza visibili senza linguaggio promozionale",
             ].map((item) => (
               <div
                 key={item}
@@ -803,7 +803,7 @@ function SegmentsBoard() {
     <div className="space-y-4">
       <div className="max-w-3xl">
         <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-          Use cases
+          Casi d&apos;uso
         </p>
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
           Screening legale trasversale, in contesti diversi.
@@ -836,7 +836,7 @@ function SegmentsBoard() {
 
         <div className="rounded-[1.8rem] border border-white/10 bg-slate-900/70 p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-            Segment focus
+            Focus segmenti
           </p>
           <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
             Lo stesso motore si adatta a casistiche molto diverse.
@@ -845,7 +845,7 @@ function SegmentsBoard() {
             {[
               "Privati: lettura rapida del rischio prima di firmare o rispondere",
               "Team: primo screening su documenti civili, penali, commerciali e compliance",
-              "Studi: revisione preliminare piu' ordinata e presentabile",
+              "Studi: revisione preliminare più ordinata e presentabile",
             ].map((item) => (
               <div
                 key={item}

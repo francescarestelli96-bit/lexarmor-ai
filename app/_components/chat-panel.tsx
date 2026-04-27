@@ -328,7 +328,7 @@ export function ChatPanel({
           </span>
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Follow-up con LexArmor
+              Approfondimento con LexArmor
             </p>
             <h3 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
               Chiedi qualsiasi cosa su questo documento.

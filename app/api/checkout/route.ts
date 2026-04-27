@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Stripe non e' configurato. Aggiungi STRIPE_SECRET_KEY nelle variabili ambiente.",
+            "Stripe non è configurato. Aggiungi STRIPE_SECRET_KEY nelle variabili ambiente.",
         },
         { status: 503 }
       );

@@ -140,7 +140,7 @@ export function toClientAccessState(
   const source = access.source ?? "checkout";
   const label =
     source === "admin"
-      ? "Admin test access"
+      ? "Accesso admin di test"
       : access.plan === "basic"
         ? "Basic attivo"
         : "Pro attivo";

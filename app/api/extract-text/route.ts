@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     if (file.size === 0) {
       return Response.json(
-        { error: "Il file e' vuoto." },
+        { error: "Il file è vuoto." },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Il file supera 12 MB. Carica una versione piu' leggera oppure esporta solo le pagine necessarie.",
+            "Il file supera 12 MB. Carica una versione più leggera oppure esporta solo le pagine necessarie.",
         },
         { status: 400 }
       );
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Non sono riuscito a estrarre abbastanza testo dal documento. Se e' un PDF scannerizzato, assicurati che sia leggibile; in alternativa esporta in PDF testuale o DOCX.",
+            "Non sono riuscito a estrarre abbastanza testo dal documento. Se è un PDF scannerizzato, assicurati che sia leggibile; in alternativa esporta in PDF testuale o DOCX.",
         },
         { status: 422 }
       );

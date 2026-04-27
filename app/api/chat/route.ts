@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Per chattare con LexArmor serve un accesso attivo. Apri il pannello Plans.",
+          "Per chattare con LexArmor serve un accesso attivo. Apri il pannello Piani.",
         code: "payment_required",
       },
       { status: 402 },
