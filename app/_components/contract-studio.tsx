@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Upload,
 } from "lucide-react";
+import { ChatPanel } from "@/app/_components/chat-panel";
 
 type PlanId = "basic" | "pro";
 
@@ -588,6 +589,7 @@ export function ContractStudio({
   const riskScoreClass = smartRiskState?.scoreClass ?? "text-white";
 
   return (
+    <div className="space-y-4 sm:space-y-5">
     <div className="grid gap-4 sm:gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] xl:gap-6">
       <section
         className={`rounded-[1.45rem] border bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(9,15,28,0.92))] p-4 transition sm:rounded-[1.8rem] sm:p-5 lg:p-7 ${
@@ -1139,6 +1141,16 @@ export function ContractStudio({
           </div>
         )}
       </section>
+    </div>
+
+    {analysis && !demoMode && (
+      <ChatPanel
+        contractText={text}
+        analysis={analysis}
+        disabled={!access.hasAccess}
+        onAccessRequired={onOpenPlans}
+      />
+    )}
     </div>
   );
 }

@@ -16,7 +16,9 @@ export async function GET() {
   const rawToken = cookieStore.get(ACCESS_COOKIE_NAME)?.value;
   const access = readAccessToken(rawToken);
   const synced = await syncStripeBackedAccess(access);
-  const adminConfigured = Boolean(readConfiguredEnv("LEXARMOR_ADMIN_KEY"));
+  const adminConfigured =
+    process.env.NODE_ENV !== "production" &&
+    Boolean(readConfiguredEnv("LEXARMOR_ADMIN_KEY"));
   const response = NextResponse.json({
     access: toClientAccessState(synced.access),
     adminConfigured,

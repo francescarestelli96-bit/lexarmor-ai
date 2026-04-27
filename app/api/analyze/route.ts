@@ -595,9 +595,7 @@ export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
     const rawToken = cookieStore.get(ACCESS_COOKIE_NAME)?.value;
-    const currentAccess = readAccessToken(
-      rawToken
-    );
+    const currentAccess = readAccessToken(rawToken);
     const synced = await syncStripeBackedAccess(currentAccess);
 
     if (!isAccessActive(synced.access)) {
