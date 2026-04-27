@@ -711,6 +711,39 @@ export function ContractStudio({
       </div>
     </div>
   );
+  const emptySignalMapCard = (
+    <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
+      <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+        Semaforo rischio
+      </p>
+      <p className="mt-2 text-sm leading-6 text-slate-300">
+        Appena analizzi un documento, qui compare subito il segnale
+        rosso, giallo o verde con il colpo d&apos;occhio principale del report.
+      </p>
+      <div className="mt-4 space-y-3">
+        {panels.map((panel) => (
+          <div
+            key={`empty-${panel.key}`}
+            className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className={`h-14 w-14 rounded-full border shadow-[0_0_28px_rgba(255,255,255,0.06)] ${panel.dotClass}`}
+              />
+              <div>
+                <p className={`text-sm font-semibold ${panel.signalText}`}>
+                  {panel.title}
+                </p>
+                <p className="mt-1 text-xs text-slate-300">
+                  {panel.subtitle}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -965,9 +998,9 @@ export function ContractStudio({
           </div>
         ) : analysis ? (
           <div className="mt-6 space-y-4">
-            <div className="rounded-[1.45rem] border border-white/8 bg-white/5 p-4 sm:rounded-[1.6rem] sm:p-5">
-              {signalMapCard}
+            {signalMapCard}
 
+            <div className="rounded-[1.45rem] border border-white/8 bg-white/5 p-4 sm:rounded-[1.6rem] sm:p-5">
               <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                 <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-200">
                   {analysis.contractType}
@@ -1107,60 +1140,33 @@ export function ContractStudio({
             </div>
           </div>
         ) : (
-          <div className="mt-5 rounded-[1.45rem] border border-white/8 bg-white/[0.04] p-4 sm:mt-6 sm:rounded-[1.6rem] sm:p-6">
-            <h3 className="text-xl font-semibold text-white">
-              Nessuna analisi disponibile
-            </h3>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
-              Carica un documento o incolla il contenuto del testo, poi avvia
-              l&apos;analisi. Il sistema riconosce il tipo di documento legale e
-              lo valuta con criteri coerenti al contesto.
-            </p>
-            <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                Semaforo rischio
+          <div className="mt-6 space-y-4">
+            {emptySignalMapCard}
+
+            <div className="rounded-[1.45rem] border border-white/8 bg-white/[0.04] p-4 sm:rounded-[1.6rem] sm:p-6">
+              <h3 className="text-xl font-semibold text-white">
+                Nessuna analisi disponibile
+              </h3>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
+                Carica un documento o incolla il contenuto del testo, poi avvia
+                l&apos;analisi. Il sistema riconosce il tipo di documento legale e
+                lo valuta con criteri coerenti al contesto.
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                Appena analizzi un documento, qui compare subito il segnale
-                rosso, giallo o verde con il colpo d&apos;occhio principale del report.
-              </p>
-              <div className="mt-4 space-y-3">
-                {panels.map((panel) => (
+
+              <div className="mt-4 grid gap-3 xl:grid-cols-3">
+                {[
+                  "Classificazione del documento legale",
+                  "Risk score e severità operative",
+                  "Obblighi nascosti e negoziazione",
+                ].map((item) => (
                   <div
-                    key={`empty-${panel.key}`}
-                    className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
+                    key={item}
+                    className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-4 text-sm leading-6 text-slate-200"
                   >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`h-14 w-14 rounded-full border shadow-[0_0_28px_rgba(255,255,255,0.06)] ${panel.dotClass}`}
-                      />
-                      <div>
-                        <p className={`text-sm font-semibold ${panel.signalText}`}>
-                          {panel.title}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-300">
-                          {panel.subtitle}
-                        </p>
-                      </div>
-                    </div>
+                    {item}
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="mt-4 grid gap-3 xl:grid-cols-3">
-              {[
-                "Classificazione del documento legale",
-                "Risk score e severità operative",
-                "Obblighi nascosti e negoziazione",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-4 text-sm leading-6 text-slate-200"
-                >
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
         )}
