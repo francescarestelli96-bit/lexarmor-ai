@@ -1116,49 +1116,51 @@ export function ContractStudio({
               l&apos;analisi. Il sistema riconosce il tipo di documento legale e
               lo valuta con criteri coerenti al contesto.
             </p>
-            <div className="mt-5 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
-                {[
-                  "Classificazione del documento legale",
-                  "Risk score e severità operative",
-                  "Obblighi nascosti e negoziazione",
-                ].map((item) => (
+            <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                Semaforo rischio
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Appena analizzi un documento, qui compare subito il segnale
+                rosso, giallo o verde con il colpo d&apos;occhio principale del report.
+              </p>
+              <div className="mt-4 space-y-3">
+                {panels.map((panel) => (
                   <div
-                    key={item}
-                    className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-4 text-sm leading-6 text-slate-200"
+                    key={`empty-${panel.key}`}
+                    className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
                   >
-                    {item}
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`h-14 w-14 rounded-full border shadow-[0_0_28px_rgba(255,255,255,0.06)] ${panel.dotClass}`}
+                      />
+                      <div>
+                        <p className={`text-sm font-semibold ${panel.signalText}`}>
+                          {panel.title}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-300">
+                          {panel.subtitle}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
 
-                <div className="rounded-[1.4rem] border border-white/10 bg-[#07101c] p-4">
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Segnali di rischio
-                  </p>
-                  <div className="mt-4 space-y-3">
-                    {panels.map((panel) => (
-                    <div
-                      key={`empty-${panel.key}`}
-                      className={`rounded-[1.1rem] border p-3 ${panel.signalTone}`}
-                    >
-                      <div className="flex items-center gap-4">
-                          <div
-                            className={`h-14 w-14 rounded-full border shadow-[0_0_28px_rgba(255,255,255,0.06)] ${panel.dotClass}`}
-                          />
-                        <div>
-                          <p className={`text-sm font-semibold ${panel.signalText}`}>
-                            {panel.title}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-300">
-                            {panel.subtitle}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+            <div className="mt-4 grid gap-3 xl:grid-cols-3">
+              {[
+                "Classificazione del documento legale",
+                "Risk score e severità operative",
+                "Obblighi nascosti e negoziazione",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-white/8 bg-slate-950/30 px-4 py-4 text-sm leading-6 text-slate-200"
+                >
+                  {item}
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         )}
