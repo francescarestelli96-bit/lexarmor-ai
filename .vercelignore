@@ -1,1 +1,5 @@
-.env.local
+# Keep local secrets and development artifacts out of manual Vercel CLI deploys.
+.env*
+.next
+node_modules
+marketing/videos
