@@ -65,39 +65,18 @@ export async function POST(request: Request) {
         source: "checkout",
       };
     } else {
-      const subscription =
-        typeof session.subscription === "object" && session.subscription
-          ? session.subscription
-          : null;
-
-      if (
-        !subscription ||
-        (subscription.status !== "active" && subscription.status !== "trialing")
-      ) {
+      if (session.payment_status !== "paid") {
         return Response.json(
-          { error: "L'abbonamento non risulta ancora attivo." },
+          { error: "Il pagamento non risulta completato." },
           { status: 402 }
         );
       }
 
-      const currentPeriodEnd =
-        subscription.items.data.reduce(
-          (latest, item) => Math.max(latest, item.current_period_end),
-          0
-        ) ||
-        Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-
       access = {
         plan,
         remainingScans: null,
-        expiresAt: new Date(currentPeriodEnd * 1000).toISOString(),
+        expiresAt: new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000).toISOString(),
         checkoutSessionId: session.id,
-        subscriptionId: subscription.id,
-        subscriptionStatus: subscription.status,
-        customerId:
-          typeof subscription.customer === "string"
-            ? subscription.customer
-            : subscription.customer?.id,
         issuedAt: new Date().toISOString(),
         source: "checkout",
       };

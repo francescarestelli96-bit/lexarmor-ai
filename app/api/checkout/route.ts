@@ -24,7 +24,7 @@ const planConfig: Record<
   },
   pro: {
     label: "Pro",
-    mode: "subscription",
+    mode: "payment",
     priceEnvKey: "STRIPE_PRO_PRICE_ID",
   },
 };
